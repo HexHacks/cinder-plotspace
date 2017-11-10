@@ -29,6 +29,8 @@ class PlotSpaceApp : public App {
     
     float mT;
     bool mAnimate;
+    bool mShowParams;
+    bool mShowFrame;
     
   public:
 	void setup() override;
@@ -36,6 +38,7 @@ class PlotSpaceApp : public App {
 	void update() override;
 	void draw() override;
     
+    void resetSpace();
     void calcSpace();
     vec3 func(const ivec3& idx, const vec3& pos);
     vec4 col(const ivec3& idx, const vec3& pos);
@@ -67,24 +70,33 @@ class PlotSpaceApp : public App {
             .updateFn([this](){ calcSpace(); });
 
         mParams->addParam("Animate", &mAnimate).key("a");
+        mParams->addSeparator();
+        mParams->addButton("Reset", [this](){ resetSpace(); }, "key=r");
+        mParams->addParam("S/H Frame", &mShowFrame).key("f");
+        mParams->addParam("S/H Params", &mShowParams).key("p");
     }
     
 };
 
 void PlotSpaceApp::setup()
 {
-    setWindowSize(500, 500);
     mT = 0.;
     mAnimate = false;
+    mShowFrame = true;
+    mShowParams = true;
+    
+    setWindowSize(500, 500);
+    
+    gl::enable( GL_LINE_SMOOTH );
+    glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+    gl::enableDepthRead();
+    gl::enableDepthWrite();
     
     mCam.lookAt(vec3(0.f, 3.f, 3.f), vec3(0.f));
     mCamUi = CameraUi(&mCam, getWindow());
     
     setupSpace();
     setupParams();
-    
-    gl::enableDepthRead();
-    gl::enableDepthWrite();
 }
 
 void PlotSpaceApp::mouseDown( MouseEvent event )
@@ -136,6 +148,27 @@ vec4 PlotSpaceApp::col(const ivec3& idx, const vec3& pos)
     return col;
 }
 
+void PlotSpaceApp::resetSpace()
+{
+    auto vbo = mSpace.getVbo();
+    auto posIter = vbo->mapAttrib3f(geom::Attrib::POSITION);
+    auto colIter = vbo->mapAttrib4f(geom::Attrib::COLOR);
+    for (size_t i = 0; i < vbo->getNumVertices(); i++)
+    {
+        auto idx = mSpace.getIdxFromFlat(i);
+        auto pos = mSpace.standardFunc(idx);
+        
+        *posIter = pos;
+        *colIter = vec4(1.);
+        
+        posIter++;
+        colIter++;
+    }
+    
+    colIter.unmap();
+    posIter.unmap();
+}
+                           
 void PlotSpaceApp::calcSpace()
 {
     auto vbo = mSpace.getVbo();
@@ -173,9 +206,12 @@ void PlotSpaceApp::draw()
     
     
     mSpace.draw();
-    gl::drawCoordinateFrame(1.);
     
-    mParams->draw();
+    if (mShowFrame)
+        gl::drawCoordinateFrame(1.);
+    
+    if (mShowParams)
+        mParams->draw();
 }
 
 CINDER_APP( PlotSpaceApp, RendererGl )
