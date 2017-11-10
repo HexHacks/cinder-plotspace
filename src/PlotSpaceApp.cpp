@@ -3,22 +3,13 @@
 #include "cinder/gl/gl.h"
 #include "cinder/CameraUi.h"
 #include "cinder/params/Params.h"
+#include "cinder/CinderMath.h"
 
 #include "LineSpace.h"
 
 using namespace ci;
 using namespace ci::app;
 using namespace std;
-
-static float clamp(float v, float min, float max)
-{
-    if (v < min)
-        return min;
-    else if (v > max)
-        return max;
-    else
-        return v;
-}
 
 class PlotSpaceApp : public App {
     CameraPersp mCam;
@@ -85,7 +76,7 @@ void PlotSpaceApp::setup()
     mShowFrame = true;
     mShowParams = true;
     
-    setWindowSize(500, 500);
+    setWindowSize(700, 700);
     
     gl::enable( GL_LINE_SMOOTH );
     glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
@@ -142,7 +133,7 @@ vec4 PlotSpaceApp::col(const ivec3& idx, const vec3& pos)
     float rad = length(pos) / outer;
     
     col.r = 1.f-rad;
-    col.g = clamp(1.f/(rad*rad+1.f), 0.f, 1.f);
+    col.g = math<float>::clamp(1.f/(rad*rad+1.f), 0.f, 1.f);
     col.w = rad;
     
     return col;
