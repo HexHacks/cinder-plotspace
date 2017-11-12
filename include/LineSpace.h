@@ -15,6 +15,9 @@
 #ifndef LineSpace_h
 #define LineSpace_h
 
+class LineSpace;
+using LineSpaceRef = std::shared_ptr<LineSpace>;
+
 class LineSpace
 {
     using vec3 = ci::vec3;
@@ -35,6 +38,14 @@ public:
         mHSize(size * 0.5f),
         mCount(count)
     {}
+    
+    static LineSpaceRef create(const vec3& size = vec3(10.), const ivec3& count = ivec3(10))
+    {
+        auto ret = std::make_shared<LineSpace>(size, count);
+        ret->generate();
+        
+        return ret;
+    }
     
     VboMeshRef getVbo() { return mVbo; }
     vec3 getSize() const { return mSize; }
@@ -100,7 +111,7 @@ public:
     
     vec3 standardFunc(const ivec3& idx) const
     {
-        vec3 zp(idx.x/float(mCount.x), idx.y/float(mCount.y), idx.z/float(mCount.z));
+        vec3 zp((idx.x)/float(mCount.x - 1), idx.y/float(mCount.y - 1), idx.z/float(mCount.z - 1));
         return zp * mSize - mHSize;
     }
     
@@ -122,7 +133,7 @@ public:
         return std::vector<vec4>(mCount.x*mCount.y*mCount.z, vec4(1.));
     }
     
-    VboMeshRef generateVbo()
+    VboMeshRef generate()
     {
         const auto cPosAttrib = ci::geom::Attrib::POSITION;
         const auto cColAttrib = ci::geom::Attrib::COLOR;
@@ -132,7 +143,6 @@ public:
         };
         
         size_t vertCount = mCount.x*mCount.y*mCount.z;
-        
         
         auto indices = createIndices();
         mVbo = VboMesh::create(vertCount, GL_LINES, bufferLayout, indices.size(), GL_UNSIGNED_INT);

@@ -19,7 +19,7 @@ class PlotSpaceApp : public App {
     CameraUi mCamUi;
     params::InterfaceGlRef mParams;
     
-    LineSpace mSpace;
+    LineSpaceRef mSpace;
     AppMovieCaptureRef mMov;
     
     float mT;
@@ -77,11 +77,6 @@ class PlotSpaceApp : public App {
         mMov->start();
     }
     
-    void setupSpace()
-    {
-        mSpace.generateVbo();
-    }
-    
     void setupParams()
     {
         mParams = params::InterfaceGl::create( getWindow(), "Parameters", ivec2( 200, 200 ) );
@@ -108,14 +103,6 @@ class PlotSpaceApp : public App {
 
 void PlotSpaceApp::setup()
 {
-    mT = 0.;
-    mAnimate = false;
-    mShowFrame = true;
-    mShowParams = true;
-    mUseSmaa = false;
-    mRecFrames = 30 * 5; // 5 secs
-    mMov = AppMovieCapture::create(this);
-    
     gl::enable( GL_LINE_SMOOTH );
     glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
     gl::enableDepthRead();
@@ -123,10 +110,20 @@ void PlotSpaceApp::setup()
     gl::enableVerticalSync();
     gl::disableAlphaBlending();
     
+    mT = 0.;
+    mAnimate = false;
+    mShowFrame = true;
+    mShowParams = true;
+    mUseSmaa = false;
+    mRecFrames = 30 * 5; // 5 secs
+    
+    mMov = AppMovieCapture::create(this);
+    mSpace = LineSpace::create(vec3(10.), ivec3(10));
+    
     mCam.lookAt(vec3(0.f, 3.f, 3.f), vec3(0.f));
     mCamUi = CameraUi(&mCam, getWindow());
     
-    setupSpace();
+    
     setupParams();
 }
 
@@ -169,7 +166,7 @@ vec3 PlotSpaceApp::func(const ivec3& idx, const vec3& pos)
 vec4 PlotSpaceApp::col(const ivec3& idx, const vec3& pos)
 {
     vec4 col(1.);
-    float outer = length(mSpace.getSize()) * 0.5f;
+    float outer = length(mSpace->getSize()) * 0.5f;
     float rad = length(pos) / outer;
     
     col.r = 1.f-rad;
@@ -181,13 +178,13 @@ vec4 PlotSpaceApp::col(const ivec3& idx, const vec3& pos)
 
 void PlotSpaceApp::resetSpace()
 {
-    auto vbo = mSpace.getVbo();
+    auto vbo = mSpace->getVbo();
     auto posIter = vbo->mapAttrib3f(geom::Attrib::POSITION);
     auto colIter = vbo->mapAttrib4f(geom::Attrib::COLOR);
     for (size_t i = 0; i < vbo->getNumVertices(); i++)
     {
-        auto idx = mSpace.getIdxFromFlat(i);
-        auto pos = mSpace.standardFunc(idx);
+        auto idx = mSpace->getIdxFromFlat(i);
+        auto pos = mSpace->standardFunc(idx);
         
         *posIter = pos;
         *colIter = vec4(1.);
@@ -202,13 +199,13 @@ void PlotSpaceApp::resetSpace()
                            
 void PlotSpaceApp::calcSpace()
 {
-    auto vbo = mSpace.getVbo();
+    auto vbo = mSpace->getVbo();
     auto posIter = vbo->mapAttrib3f(geom::Attrib::POSITION);
     auto colIter = vbo->mapAttrib4f(geom::Attrib::COLOR);
     for (size_t i = 0; i < vbo->getNumVertices(); i++)
     {
-        auto idx = mSpace.getIdxFromFlat(i);
-        auto pos = mSpace.standardFunc(idx);
+        auto idx = mSpace->getIdxFromFlat(i);
+        auto pos = mSpace->standardFunc(idx);
         
         *posIter = func(idx, pos);
         *colIter = col(idx, pos);
@@ -269,7 +266,7 @@ void PlotSpaceApp::renderScene()
     gl::ScopedViewport scpViewport(0, 0, mFboScene->getWidth(), mFboScene->getHeight());
     gl::setMatrices(mCam);
     
-    mSpace.draw();
+    mSpace->draw();
     
     if (!mMov->isCapturing())
     {
