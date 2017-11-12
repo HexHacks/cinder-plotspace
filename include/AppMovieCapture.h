@@ -31,10 +31,11 @@ class AppMovieCapture
     App* mApp;
     int mAutoFinish;
     int mFrame;
+    bool mRenewPath;
     
 public:
     
-    AppMovieCapture(App* app): mMov(nullptr), mApp(app), mAutoFinish(-1), mFrame(0)
+    AppMovieCapture(App* app): mMov(nullptr), mApp(app), mAutoFinish(-1), mFrame(0), mRenewPath(true)
     {
         mPath = ensureTmpPath();
     }
@@ -102,12 +103,22 @@ public:
         return mAutoFinish;
     }
     
-    int getCurrentFrame()
+    int getCurrentFrame() const
     {
         return mFrame;
     }
     
-    bool isCapturing()
+    void setRenewPath(bool renew)
+    {
+        mRenewPath = renew;
+    }
+    
+    bool getRenewPath() const
+    {
+        return mRenewPath;
+    }
+    
+    bool isCapturing() const
     {
         return mMov != nullptr;
     }
@@ -115,6 +126,8 @@ public:
     void start()
     {
         mFrame = 0;
+        if (mRenewPath)
+            mPath = ensureTmpPath();
         mMov = MovieWriter::create(mPath, mApp->getWindowWidth(), mApp->getWindowHeight(), mFormat);
     }
     
