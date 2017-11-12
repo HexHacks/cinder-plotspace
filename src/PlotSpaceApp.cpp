@@ -6,6 +6,7 @@
 #include "cinder/CinderMath.h"
 
 #include "LineSpace.h"
+#include "AppMovieCapture.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -17,6 +18,7 @@ class PlotSpaceApp : public App {
     params::InterfaceGlRef mParams;
     
     LineSpace mSpace;
+    AppMovieCaptureRef mMov;
     
     float mT;
     bool mAnimate;
@@ -44,6 +46,15 @@ class PlotSpaceApp : public App {
         mCam.setAspectRatio(getWindowAspectRatio());
     }
     
+    void startRec()
+    {
+        mShowFrame = false;
+        mShowParams = false;
+        // 3 secs
+        mMov->setAutoFinish(30 * 3);
+        mMov->start();
+    }
+    
     void setupSpace()
     {
         mSpace.generateVbo();
@@ -62,9 +73,14 @@ class PlotSpaceApp : public App {
 
         mParams->addParam("Animate", &mAnimate).key("a");
         mParams->addSeparator();
-        mParams->addButton("Reset", [this](){ resetSpace(); }, "key=r");
+        //mParams->addParam("Rec frames",
+        //                  bind(&AppMovieCapture::setAutoFinish, mMov, placeholders::_1),
+        //                  bind(&AppMovieCapture::getAutoFinish, mMov));
+        mParams->addButton("Record", [this](){ startRec(); }, "key=r");
+        mParams->addSeparator();
         mParams->addParam("S/H Frame", &mShowFrame).key("f");
         mParams->addParam("S/H Params", &mShowParams).key("p");
+        mParams->addButton("Reset", [this](){ resetSpace(); }, "key=c");
     }
     
 };
@@ -75,6 +91,7 @@ void PlotSpaceApp::setup()
     mAnimate = false;
     mShowFrame = true;
     mShowParams = true;
+    mMov = AppMovieCapture::create(this);
     
     setWindowSize(700, 700);
     
@@ -203,6 +220,8 @@ void PlotSpaceApp::draw()
     
     if (mShowParams)
         mParams->draw();
+    
+    mMov->captureFrame();
 }
 
 CINDER_APP( PlotSpaceApp, RendererGl )

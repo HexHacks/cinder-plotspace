@@ -34,6 +34,7 @@
 		00B995591B128DF400A5C623 /* IOSurface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOSurface.framework; path = System/Library/Frameworks/IOSurface.framework; sourceTree = SDKROOT; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		16E0EBB91FB5FEFE0018285F /* LineSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LineSpace.h; path = ../include/LineSpace.h; sourceTree = "<group>"; };
+		16E0EBBA1FB700060018285F /* AppMovieCapture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppMovieCapture.h; path = ../include/AppMovieCapture.h; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		2E720DBFF4264E9CAEF1D2E2 /* Resources.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Resources.h; path = ../include/Resources.h; sourceTree = "<group>"; };
@@ -136,6 +137,7 @@
 				16E0EBB91FB5FEFE0018285F /* LineSpace.h */,
 				2E720DBFF4264E9CAEF1D2E2 /* Resources.h */,
 				9B73EBAA23A94822A8FD4F98 /* PlotSpace_Prefix.pch */,
+				16E0EBBA1FB700060018285F /* AppMovieCapture.h */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
