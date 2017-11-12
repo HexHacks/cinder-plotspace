@@ -16,6 +16,7 @@
 		00B784B60FF439BC000DE1D7 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B20FF439BC000DE1D7 /* CoreAudio.framework */; };
 		00B9955A1B128DF400A5C623 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B995581B128DF400A5C623 /* IOKit.framework */; };
 		00B9955B1B128DF400A5C623 /* IOSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B995591B128DF400A5C623 /* IOSurface.framework */; };
+		16E0EBC11FB8806A0018285F /* SMAA.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E0EBBF1FB8806A0018285F /* SMAA.cpp */; };
 		5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B10EAFCA74003A9687 /* CoreVideo.framework */; };
 		7399E654AA414726AA237B08 /* PlotSpaceApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 380EF23AC70E4E3C94EBA7A0 /* PlotSpaceApp.cpp */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -35,6 +36,10 @@
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		16E0EBB91FB5FEFE0018285F /* LineSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LineSpace.h; path = ../include/LineSpace.h; sourceTree = "<group>"; };
 		16E0EBBA1FB700060018285F /* AppMovieCapture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppMovieCapture.h; path = ../include/AppMovieCapture.h; sourceTree = "<group>"; };
+		16E0EBBD1FB8806A0018285F /* AreaTex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AreaTex.h; path = ../src/smaa/AreaTex.h; sourceTree = "<group>"; };
+		16E0EBBE1FB8806A0018285F /* SearchTex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SearchTex.h; path = ../src/smaa/SearchTex.h; sourceTree = "<group>"; };
+		16E0EBBF1FB8806A0018285F /* SMAA.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMAA.cpp; path = ../src/smaa/SMAA.cpp; sourceTree = "<group>"; };
+		16E0EBC01FB8806A0018285F /* SMAA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMAA.h; path = ../src/smaa/SMAA.h; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		2E720DBFF4264E9CAEF1D2E2 /* Resources.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Resources.h; path = ../include/Resources.h; sourceTree = "<group>"; };
@@ -78,6 +83,7 @@
 		080E96DDFE201D6D7F000001 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				16E0EBC21FB8807B0018285F /* SMAA */,
 				380EF23AC70E4E3C94EBA7A0 /* PlotSpaceApp.cpp */,
 			);
 			name = Source;
@@ -108,6 +114,17 @@
 				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
 			);
 			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		16E0EBC21FB8807B0018285F /* SMAA */ = {
+			isa = PBXGroup;
+			children = (
+				16E0EBBD1FB8806A0018285F /* AreaTex.h */,
+				16E0EBBE1FB8806A0018285F /* SearchTex.h */,
+				16E0EBBF1FB8806A0018285F /* SMAA.cpp */,
+				16E0EBC01FB8806A0018285F /* SMAA.h */,
+			);
+			name = SMAA;
 			sourceTree = "<group>";
 		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
@@ -225,6 +242,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7399E654AA414726AA237B08 /* PlotSpaceApp.cpp in Sources */,
+				16E0EBC11FB8806A0018285F /* SMAA.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -8,6 +8,8 @@
 #include "LineSpace.h"
 #include "AppMovieCapture.h"
 
+#include "smaa/SMAA.h"
+
 using namespace ci;
 using namespace ci::app;
 using namespace std;
@@ -24,12 +26,22 @@ class PlotSpaceApp : public App {
     bool mAnimate;
     bool mShowParams;
     bool mShowFrame;
+    bool mUseSmaa;
+    unsigned int mRecFrames;
+    
+    gl::FboRef mFboScene;
+    gl::FboRef mFboFinal;
+    gl::TextureRef mFrameTex;
+    
+    SMAA mSMAA;
     
   public:
 	void setup() override;
 	void mouseDown( MouseEvent event ) override;
 	void update() override;
 	void draw() override;
+    
+    void renderScene();
     
     void resetSpace();
     void calcSpace();
@@ -39,17 +51,29 @@ class PlotSpaceApp : public App {
     void prepareSettings( Settings *settings )
     {
         settings->setHighDensityDisplayEnabled();
+        settings->setWindowSize( 700, 700 );
     }
     
     void resize() override
     {
+        gl::Texture2d::Format tfmt;
+        tfmt.setMinFilter( GL_NEAREST );
+        tfmt.setMagFilter( GL_NEAREST );
+        tfmt.setInternalFormat( GL_RGBA8 );
+        
+        gl::Fbo::Format fmt;
+        fmt.setColorTextureFormat( tfmt );
+        
+        mFboScene = gl::Fbo::create( getWindowWidth(), getWindowHeight(), fmt );
+        mFboFinal = gl::Fbo::create( getWindowWidth(), getWindowHeight(), fmt );
+        
         mCam.setAspectRatio(getWindowAspectRatio());
     }
     
     void startRec()
     {
         // 5 secs
-        mMov->setAutoFinish(30 * 5);
+        mMov->setAutoFinish(mRecFrames);
         mMov->start();
     }
     
@@ -70,10 +94,9 @@ class PlotSpaceApp : public App {
             .updateFn([this](){ calcSpace(); });
 
         mParams->addParam("Animate", &mAnimate).key("a");
+        mParams->addParam("SMAA", &mUseSmaa).key("s");
         mParams->addSeparator();
-        //mParams->addParam("Rec frames",
-        //                  bind(&AppMovieCapture::setAutoFinish, mMov, placeholders::_1),
-        //                  bind(&AppMovieCapture::getAutoFinish, mMov));
+        mParams->addParam("Rec frames", &mRecFrames);
         mParams->addButton("Record", [this](){ startRec(); }, "key=r");
         mParams->addSeparator();
         mParams->addParam("S/H Frame", &mShowFrame).key("f");
@@ -89,14 +112,16 @@ void PlotSpaceApp::setup()
     mAnimate = false;
     mShowFrame = true;
     mShowParams = true;
+    mUseSmaa = false;
+    mRecFrames = 30 * 5; // 5 secs
     mMov = AppMovieCapture::create(this);
-    
-    setWindowSize(700, 700);
     
     gl::enable( GL_LINE_SMOOTH );
     glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
     gl::enableDepthRead();
     gl::enableDepthWrite();
+    gl::enableVerticalSync();
+    gl::disableAlphaBlending();
     
     mCam.lookAt(vec3(0.f, 3.f, 3.f), vec3(0.f));
     mCamUi = CameraUi(&mCam, getWindow());
@@ -207,17 +232,46 @@ void PlotSpaceApp::update()
 
 void PlotSpaceApp::draw()
 {
-    gl::clear( Color::gray(0.3) );
-    gl::setMatrices(mCam);
+    renderScene();
     
+    gl::clear();
+    gl::color( Color::white() );
     
-    mSpace.draw();
+    if (mUseSmaa)
+    {
+        mSMAA.apply( mFboFinal, mFboScene );
+        mFrameTex = mFboFinal->getColorTexture();
+    }
+    else
+        mFrameTex = mFboScene->getColorTexture();
+    
+    {
+        gl::ScopedMatrices scpMat;
+        gl::setMatricesWindow( getWindowWidth(), getWindowHeight() );
+        gl::draw(mFrameTex, getWindowBounds());
+    }
     
     if (mMov->isCapturing())
     {
         mMov->captureFrame();
     }
-    else
+}
+
+void PlotSpaceApp::renderScene()
+{
+    gl::ScopedFramebuffer scpFbo( mFboScene );
+    
+    // Clear the buffer.
+    gl::clear( ColorA(0.3, 0.3, 0.3, 1.0) );
+    //gl::color( Color::gray(0.3) );
+    
+    // Render our scene.
+    gl::ScopedViewport scpViewport(0, 0, mFboScene->getWidth(), mFboScene->getHeight());
+    gl::setMatrices(mCam);
+    
+    mSpace.draw();
+    
+    if (!mMov->isCapturing())
     {
         if (mShowFrame)
             gl::drawCoordinateFrame(1.);
@@ -226,5 +280,6 @@ void PlotSpaceApp::draw()
             mParams->draw();
     }
 }
+
 
 CINDER_APP( PlotSpaceApp, RendererGl )
