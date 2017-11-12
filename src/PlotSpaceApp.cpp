@@ -48,10 +48,8 @@ class PlotSpaceApp : public App {
     
     void startRec()
     {
-        mShowFrame = false;
-        mShowParams = false;
-        // 3 secs
-        mMov->setAutoFinish(30 * 3);
+        // 5 secs
+        mMov->setAutoFinish(30 * 5);
         mMov->start();
     }
     
@@ -215,13 +213,18 @@ void PlotSpaceApp::draw()
     
     mSpace.draw();
     
-    if (mShowFrame)
-        gl::drawCoordinateFrame(1.);
-    
-    if (mShowParams)
-        mParams->draw();
-    
-    mMov->captureFrame();
+    if (mMov->isCapturing())
+    {
+        mMov->captureFrame();
+    }
+    else
+    {
+        if (mShowFrame)
+            gl::drawCoordinateFrame(1.);
+        
+        if (mShowParams)
+            mParams->draw();
+    }
 }
 
 CINDER_APP( PlotSpaceApp, RendererGl )
