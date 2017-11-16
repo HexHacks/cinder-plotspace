@@ -28,6 +28,8 @@ class PlotSpaceApp : public App {
     bool mShowFrame;
     bool mUseSmaa;
     unsigned int mRecFrames;
+    vec3 mSize;
+    vec3 mDivs;
     
     gl::FboRef mFboScene;
     gl::FboRef mFboFinal;
@@ -87,12 +89,20 @@ class PlotSpaceApp : public App {
             .keyIncr("+")
             .keyDecr("-")
             .updateFn([this](){ calcSpace(); });
+        
+        auto updateSpaceFun = [this]()
+        {
+            mSpace = LineSpace::create(mSize, vec3(mDivs));
+        };
 
         mParams->addParam("Animate", &mAnimate).key("a");
         mParams->addParam("SMAA", &mUseSmaa).key("s");
         mParams->addSeparator();
         mParams->addParam("Rec frames", &mRecFrames);
         mParams->addButton("Record", [this](){ startRec(); }, "key=r");
+        mParams->addSeparator();
+        mParams->addParam("Size", &mSize).updateFn(updateSpaceFun);
+        mParams->addParam("Divs", &mDivs).updateFn(updateSpaceFun);
         mParams->addSeparator();
         mParams->addParam("S/H Frame", &mShowFrame).key("f");
         mParams->addParam("S/H Params", &mShowParams).key("p");
@@ -116,9 +126,11 @@ void PlotSpaceApp::setup()
     mShowParams = true;
     mUseSmaa = false;
     mRecFrames = 30 * 5; // 5 secs
+    mSize = vec3(10.f);
+    mDivs = ivec3(20);
     
     mMov = AppMovieCapture::create(this);
-    mSpace = LineSpace::create(vec3(10.), ivec3(10));
+    mSpace = LineSpace::create(mSize, vec3(mDivs));
     
     mCam.lookAt(vec3(0.f, 3.f, 3.f), vec3(0.f));
     mCamUi = CameraUi(&mCam, getWindow());
@@ -157,7 +169,7 @@ vec3 PlotSpaceApp::func(const ivec3& idx, const vec3& pos)
     auto T = m4(1., 0., 0., 0.,
                 0., 1., 0., 0.,
                 0., 0., 1., 0.,
-                0.1*sin(pos.x+mT), 0.1*cos(pos.y*pos.z+mT), 0., 1.);
+                0.5*sin(mT), 0., 0., 1);//0.1*sin(pos.x+mT), 0.1*cos(pos.y*pos.z+mT), 0., 1.);
 
     
     return v3(T * v4(pos));
@@ -222,7 +234,8 @@ void PlotSpaceApp::update()
 {
     if (mAnimate)
     {
-        mT = 5.f*(sin(getElapsedSeconds())+1.f);
+        auto s = getElapsedFrames() / float(mMov->getFps());
+        mT = 5.f*(sin(s)+1.f);
         calcSpace();
     }
 }

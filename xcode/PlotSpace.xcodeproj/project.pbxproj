@@ -17,6 +17,16 @@
 		00B9955A1B128DF400A5C623 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B995581B128DF400A5C623 /* IOKit.framework */; };
 		00B9955B1B128DF400A5C623 /* IOSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B995591B128DF400A5C623 /* IOSurface.framework */; };
 		16E0EBC11FB8806A0018285F /* SMAA.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E0EBBF1FB8806A0018285F /* SMAA.cpp */; };
+		16E0EBC61FB9CBDF0018285F /* MovieWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E0EBC51FB9CBDF0018285F /* MovieWriter.cpp */; };
+		16FA3B721FBC40D400815F08 /* libavcodec.57.107.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B6D1FBC3F7F00815F08 /* libavcodec.57.107.100.dylib */; };
+		16FA3B7B1FBC40D400815F08 /* libavdevice.57.10.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B731FBC40D400815F08 /* libavdevice.57.10.100.dylib */; };
+		16FA3B7C1FBC40D400815F08 /* libavfilter.6.107.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B741FBC40D400815F08 /* libavfilter.6.107.100.dylib */; };
+		16FA3B7D1FBC40D400815F08 /* libavformat.57.83.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B751FBC40D400815F08 /* libavformat.57.83.100.dylib */; };
+		16FA3B7E1FBC40D400815F08 /* libavresample.3.7.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B761FBC40D400815F08 /* libavresample.3.7.0.dylib */; };
+		16FA3B7F1FBC40D400815F08 /* libavutil.55.78.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B771FBC40D400815F08 /* libavutil.55.78.100.dylib */; };
+		16FA3B801FBC40D400815F08 /* libpostproc.54.7.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B781FBC40D400815F08 /* libpostproc.54.7.100.dylib */; };
+		16FA3B811FBC40D400815F08 /* libswresample.2.9.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B791FBC40D400815F08 /* libswresample.2.9.100.dylib */; };
+		16FA3B821FBC40D400815F08 /* libswscale.4.8.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B7A1FBC40D400815F08 /* libswscale.4.8.100.dylib */; };
 		5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B10EAFCA74003A9687 /* CoreVideo.framework */; };
 		7399E654AA414726AA237B08 /* PlotSpaceApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 380EF23AC70E4E3C94EBA7A0 /* PlotSpaceApp.cpp */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -40,6 +50,17 @@
 		16E0EBBE1FB8806A0018285F /* SearchTex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SearchTex.h; path = ../src/smaa/SearchTex.h; sourceTree = "<group>"; };
 		16E0EBBF1FB8806A0018285F /* SMAA.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMAA.cpp; path = ../src/smaa/SMAA.cpp; sourceTree = "<group>"; };
 		16E0EBC01FB8806A0018285F /* SMAA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMAA.h; path = ../src/smaa/SMAA.h; sourceTree = "<group>"; };
+		16E0EBC31FB9CADF0018285F /* MovieWriter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MovieWriter.h; path = ../include/MovieWriter.h; sourceTree = "<group>"; };
+		16E0EBC51FB9CBDF0018285F /* MovieWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MovieWriter.cpp; path = ../src/MovieWriter.cpp; sourceTree = "<group>"; };
+		16FA3B6D1FBC3F7F00815F08 /* libavcodec.57.107.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libavcodec.57.107.100.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libavcodec.57.107.100.dylib; sourceTree = "<group>"; };
+		16FA3B731FBC40D400815F08 /* libavdevice.57.10.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libavdevice.57.10.100.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libavdevice.57.10.100.dylib; sourceTree = "<group>"; };
+		16FA3B741FBC40D400815F08 /* libavfilter.6.107.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libavfilter.6.107.100.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libavfilter.6.107.100.dylib; sourceTree = "<group>"; };
+		16FA3B751FBC40D400815F08 /* libavformat.57.83.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libavformat.57.83.100.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libavformat.57.83.100.dylib; sourceTree = "<group>"; };
+		16FA3B761FBC40D400815F08 /* libavresample.3.7.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libavresample.3.7.0.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libavresample.3.7.0.dylib; sourceTree = "<group>"; };
+		16FA3B771FBC40D400815F08 /* libavutil.55.78.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libavutil.55.78.100.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libavutil.55.78.100.dylib; sourceTree = "<group>"; };
+		16FA3B781FBC40D400815F08 /* libpostproc.54.7.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpostproc.54.7.100.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libpostproc.54.7.100.dylib; sourceTree = "<group>"; };
+		16FA3B791FBC40D400815F08 /* libswresample.2.9.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libswresample.2.9.100.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libswresample.2.9.100.dylib; sourceTree = "<group>"; };
+		16FA3B7A1FBC40D400815F08 /* libswscale.4.8.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libswscale.4.8.100.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libswscale.4.8.100.dylib; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		2E720DBFF4264E9CAEF1D2E2 /* Resources.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Resources.h; path = ../include/Resources.h; sourceTree = "<group>"; };
@@ -56,6 +77,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16FA3B7B1FBC40D400815F08 /* libavdevice.57.10.100.dylib in Frameworks */,
+				16FA3B7C1FBC40D400815F08 /* libavfilter.6.107.100.dylib in Frameworks */,
+				16FA3B7D1FBC40D400815F08 /* libavformat.57.83.100.dylib in Frameworks */,
+				16FA3B7E1FBC40D400815F08 /* libavresample.3.7.0.dylib in Frameworks */,
+				16FA3B7F1FBC40D400815F08 /* libavutil.55.78.100.dylib in Frameworks */,
+				16FA3B801FBC40D400815F08 /* libpostproc.54.7.100.dylib in Frameworks */,
+				16FA3B811FBC40D400815F08 /* libswresample.2.9.100.dylib in Frameworks */,
+				16FA3B821FBC40D400815F08 /* libswscale.4.8.100.dylib in Frameworks */,
+				16FA3B721FBC40D400815F08 /* libavcodec.57.107.100.dylib in Frameworks */,
 				006D720419952D00008149E2 /* AVFoundation.framework in Frameworks */,
 				006D720519952D00008149E2 /* CoreMedia.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
@@ -85,6 +115,7 @@
 			children = (
 				16E0EBC21FB8807B0018285F /* SMAA */,
 				380EF23AC70E4E3C94EBA7A0 /* PlotSpaceApp.cpp */,
+				16E0EBC51FB9CBDF0018285F /* MovieWriter.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -155,6 +186,7 @@
 				2E720DBFF4264E9CAEF1D2E2 /* Resources.h */,
 				9B73EBAA23A94822A8FD4F98 /* PlotSpace_Prefix.pch */,
 				16E0EBBA1FB700060018285F /* AppMovieCapture.h */,
+				16E0EBC31FB9CADF0018285F /* MovieWriter.h */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
@@ -171,6 +203,15 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				16FA3B731FBC40D400815F08 /* libavdevice.57.10.100.dylib */,
+				16FA3B741FBC40D400815F08 /* libavfilter.6.107.100.dylib */,
+				16FA3B751FBC40D400815F08 /* libavformat.57.83.100.dylib */,
+				16FA3B761FBC40D400815F08 /* libavresample.3.7.0.dylib */,
+				16FA3B771FBC40D400815F08 /* libavutil.55.78.100.dylib */,
+				16FA3B781FBC40D400815F08 /* libpostproc.54.7.100.dylib */,
+				16FA3B791FBC40D400815F08 /* libswresample.2.9.100.dylib */,
+				16FA3B7A1FBC40D400815F08 /* libswscale.4.8.100.dylib */,
+				16FA3B6D1FBC3F7F00815F08 /* libavcodec.57.107.100.dylib */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
@@ -241,6 +282,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16E0EBC61FB9CBDF0018285F /* MovieWriter.cpp in Sources */,
 				7399E654AA414726AA237B08 /* PlotSpaceApp.cpp in Sources */,
 				16E0EBC11FB8806A0018285F /* SMAA.cpp in Sources */,
 			);
@@ -309,7 +351,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CINDER_PATH = ../../../cinder_0.9.0_mac;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++11";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -329,11 +371,22 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\"";
+				HEADER_SEARCH_PATHS = (
+					"\"$(CINDER_PATH)/include\"",
+					/usr/local/Cellar/ffmpeg/3.4/include,
+				);
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"\"$(CINDER_PATH)/include\"",
+					/usr/local/Cellar/ffmpeg/3.4/include,
+				);
+				LIBRARY_SEARCH_PATHS = "\"/usr/local/Cellar/ffmpeg/3.4/lib\"";
+				"LIBRARY_SEARCH_PATHS[arch=*]" = "\"/usr/local/Cellar/ffmpeg/3.4/lib\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
 				SDKROOT = macosx;
-				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include";
+				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include /usr/local/Cellar/ffmpeg/3.4/include";
 			};
 			name = Debug;
 		};
@@ -343,7 +396,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CINDER_PATH = ../../../cinder_0.9.0_mac;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++11";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -362,10 +415,20 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\"";
+				HEADER_SEARCH_PATHS = (
+					"\"$(CINDER_PATH)/include\"",
+					/usr/local/Cellar/ffmpeg/3.4/include,
+				);
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"\"$(CINDER_PATH)/include\"",
+					/usr/local/Cellar/ffmpeg/3.4/include,
+				);
+				LIBRARY_SEARCH_PATHS = "\"/usr/local/Cellar/ffmpeg/3.4/lib\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
 				SDKROOT = macosx;
-				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include";
+				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include /usr/local/Cellar/ffmpeg/3.4/include";
 			};
 			name = Release;
 		};

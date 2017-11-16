@@ -10,7 +10,7 @@
 #include <boost/filesystem.hpp>
 #include <exception>
 #include "cinder/app/App.h"
-#include "cinder/qtime/AvfWriter.h"
+#include "MovieWriter.h"
 
 #ifndef AppMovieCapture_h
 #define AppMovieCapture_h
@@ -20,8 +20,8 @@ using AppMovieCaptureRef = std::shared_ptr<AppMovieCapture>;
 
 class AppMovieCapture
 {
-    using MovieWriter = ::ci::qtime::MovieWriter;
-    using MovieWriterRef = ::ci::qtime::MovieWriterRef;
+    using MovieWriter = ::jp::MovieWriter;
+    using MovieWriterRef = ::jp::MovieWriterRef;
     using App = ::ci::app::App;
     using path = ::ci::fs::path;
     
@@ -46,11 +46,11 @@ public:
         return std::make_shared<AppMovieCapture>(app);
     }
     
-    path ensureTmpPath() const
+    path ensureTmpPath(const std::string ext = "mkv") const
     {
         auto fold = mApp->getAssetPath("");
         auto outd = fold / "output";
-        auto o = outd / "capture_0.mov";
+        auto o = outd / (boost::format("capture_0.%1%") % ext).str();
         if (!::ci::fs::exists(outd))
         {
             ::ci::fs::create_directory(outd);
@@ -60,7 +60,7 @@ public:
             int i = 0;
             while (::ci::fs::exists(o))
             {
-                o = outd / (boost::format("capture_%1%.mov") % i++).str();
+                o = outd / (boost::format("capture_%1%.%2%") % i++ % ext).str();
             }
         }
         else
@@ -83,14 +83,14 @@ public:
         return mPath;
     }
     
-    void setFps(float fps)
+    void setFps(int fps)
     {
-        mFormat.defaultFrameDuration(1.f/fps);
+        mFormat.framesPerSecond = fps;
     }
     
-    float getFps() const
+    int getFps() const
     {
-        return 1.f/mFormat.getDefaultFrameDuration();
+        return mFormat.framesPerSecond;
     }
     
     void setAutoFinish(int af)
@@ -128,7 +128,10 @@ public:
         mFrame = 0;
         if (mRenewPath)
             mPath = ensureTmpPath();
-        mMov = MovieWriter::create(mPath, mApp->getWindowWidth(), mApp->getWindowHeight(), mFormat);
+        
+        mFormat.width = mApp->getWindowWidth();
+        mFormat.height = mApp->getWindowHeight();
+        mMov = MovieWriter::create(mPath, mFormat);
     }
     
     void captureFrame()
@@ -145,7 +148,7 @@ public:
     
     void finish()
     {
-        mMov->finish();
+        mMov->close();
         mMov = nullptr;
     }
 };
