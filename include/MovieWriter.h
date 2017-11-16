@@ -11,6 +11,8 @@
 
 #include <memory>
 #include <cstdint>
+#include <map>
+#include <string>
 #include <boost/filesystem.hpp>
 
 #ifdef __cplusplus
@@ -21,6 +23,13 @@ extern "C" {
     
 #ifdef __cplusplus
 }
+#endif
+
+// Remove this if cinder is not available
+#define USE_CINDER
+
+#ifdef USE_CINDER
+#include <cinder/Surface.h>
 #endif
 
 struct AVFormatContext;
@@ -38,19 +47,19 @@ namespace jp
     public:
         // Typedefs
         using path = boost::filesystem::path;
+        using Options = std::map<std::string, std::string>;
         
         struct Format
         {
             AVCodecID videoCodec;
-            AVPixelFormat pixelFormat;
             //AVCodecID audioCodec; // Not yet implemented
             
             int framesPerSecond;
             int width, height;
+            Options videoOptions;
             
             Format() :
                 videoCodec(AV_CODEC_ID_H264),
-                pixelFormat(AV_PIX_FMT_BGR24),
                 framesPerSecond(30),
                 width(512),
                 height(523)
@@ -63,9 +72,15 @@ namespace jp
         MovieWriter();
         ~MovieWriter();
         
+        static Format getHighQualityH264Format();
+        
         static MovieWriterRef create(const path& path, const Format& format);
         
-        void addFrame(void* data, size_t bytes, AVPixelFormat pixelFormat);
+        //void addFrame(void* data, size_t bytes, AVPixelFormat pixelFormat);
+        
+#ifdef USE_CINDER
+        void addFrame(const cinder::Surface& surface);
+#endif
         
         void open(const path& path, const Format& format);
         void close();
@@ -85,7 +100,9 @@ namespace jp
         void openVideoStream();
         void writeHeader();
         
-        void cpyToFrame(void* data, size_t bytes, AVPixelFormat pixelFormat);
+#ifdef USE_CINDER
+        void cpyToFrame(const cinder::Surface& surface);
+#endif
         void encodeFrame();
     };
 }

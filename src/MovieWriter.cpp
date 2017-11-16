@@ -29,11 +29,18 @@ extern "C" {
 
 static void throwOnCondition(bool cond, const char* msg)
 {
-    if (!cond)
+    if (cond)
         throw std::runtime_error(msg);
 }
 
 #define THROW_ON_NULL(a, msg) throwOnCondition(a == nullptr, msg)
+
+#define STREAM_PIX_FMT AV_PIX_FMT_YUV420P
+#define TMP_PIX_FMT AV_PIX_FMT_RGB24
+#define TMP_R 0
+#define TMP_G 1
+#define TMP_B 2
+#define TMP_PIX_SIZE 3
 
 namespace jp
 {
@@ -48,6 +55,8 @@ namespace jp
         
         AVFrame* frame;
         AVFrame* tmp_frame;
+        
+        AVPacket* pkt;
         
         float t, tincr, tincr2;
         
@@ -71,7 +80,7 @@ namespace jp
         mFormat(),
         mPath(),
         mContext(nullptr),
-        mVideoStream(std::make_unique<OutputStream>())
+        mVideoStream(std::make_shared<OutputStream>())
     {
         initialize();
     }
@@ -88,61 +97,114 @@ namespace jp
         return ret;
     }
     
-    void MovieWriter::cpyToFrame(void* data, size_t bytes, AVPixelFormat pixelFormat)
+    MovieWriter::Format MovieWriter::getHighQualityH264Format()
     {
-        auto desc = av_pix_fmt_desc_get(pixelFormat);
-        THROW_ON_NULL(desc, "Could not get a pixel description");
-        
-        auto bitsPerPixel = av_get_bits_per_pixel(desc);
-        auto bytesInImage = bitsPerPixel / 8 * mFormat.width * mFormat.height;
-        throwOnCondition(bytes == bytesInImage , "Bad image input size");
-        
-        
-        if (bytes != mFormat.width * mFormat.height)
-            throw std::runtime_error("Bad pixel");
-        
-        auto ret = av_frame_make_writable(mVideoStream->frame);
-        throwOnCondition(ret < 0, "Could not make frame writable");
-        
-        auto enc = mVideoStream->enc;
-        auto dstFrame = mVideoStream->frame;
-        if (pixelFormat != mVideoStream->enc->pix_fmt)
-        {
-            if (!mVideoStream->sws_ctx)
-            {
-                mVideoStream->sws_ctx = sws_getContext(mFormat.width, mFormat.height, pixelFormat,
-                                                       enc->width , enc->height, enc->pix_fmt,
-                                                       SWS_BICUBIC, nullptr, nullptr, nullptr);
-                
-                THROW_ON_NULL(mVideoStream->sws_ctx, "Could not create scaling context");
-            }
-            
-            auto srcFrame = mVideoStream->tmp_frame;
-            memcpy(srcFrame, data, bytes);
-            sws_scale(mVideoStream->sws_ctx, (const uint8_t * const *) srcFrame->data,
-                      srcFrame->linesize, 0, enc->height, dstFrame->data, dstFrame->linesize);
-        }
-        else
-        {
-            memcpy(dstFrame, data, bytes);
-        }
-        
-        dstFrame->pts = mVideoStream->next_pts++;
+        Format out;
+        out.videoCodec = AV_CODEC_ID_H264;
+        out.options[""] = "";
     }
     
     void MovieWriter::encodeFrame()
     {
         auto ret = avcodec_send_frame(mVideoStream->enc, mVideoStream->frame);
         throwOnCondition(ret < 0, "Error encoding video frame");
+        
+        auto encoder = mVideoStream->enc;
+        auto pkt = mVideoStream->pkt;
+        auto stream = mVideoStream->st;
+        while (ret >= 0)
+        {
+            ret = avcodec_receive_packet(encoder, pkt);
+            if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
+                return;
+            else if (ret < 0)
+                throw std::runtime_error("Error while encoding");
+            
+            // Rescale output packet timestamp values from codec to stream timebase
+            av_packet_rescale_ts(pkt, encoder->time_base, stream->time_base);
+            pkt->stream_index = stream->index;
+            
+            // Write to disk
+            ret = av_interleaved_write_frame(mContext, pkt);
+            throwOnCondition(ret < 0 , "Error writing frame");
+            av_packet_unref(pkt);
+        }
     }
     
-    void MovieWriter::addFrame(void* data, size_t bytes, AVPixelFormat pixelFormat)
+#ifdef USE_CINDER
+    
+    void cpySurfaceToFrame(AVFrame* frame, const cinder::Surface& surface)
+    {
+        // TODO: Size checks
+        auto iter = surface.getIter();
+        
+        int y = 0;
+        while (iter.line())
+        {
+            int x = 0;
+            while (iter.pixel())
+            {
+                auto x0 = x*TMP_PIX_SIZE;
+                frame->data[0][y * frame->linesize[0] + x0 + TMP_R] = iter.r();
+                frame->data[0][y * frame->linesize[0] + x0 + TMP_G] = iter.g();
+                frame->data[0][y * frame->linesize[0] + x0 + TMP_B] = iter.b();
+                
+                x++;
+            }
+            y++;
+        }
+    }
+    
+    void MovieWriter::cpyToFrame(const cinder::Surface& surface)
+    {
+        auto enc = mVideoStream->enc;
+        auto dstFrame = mVideoStream->frame;
+        if (mVideoStream->enc->pix_fmt != TMP_PIX_FMT)
+        {
+            if (!mVideoStream->sws_ctx)
+            {
+                int okInp = sws_isSupportedInput(TMP_PIX_FMT);
+                throwOnCondition(okInp < 0, "Bad conversion input pixel formet");
+                
+                int okOut = sws_isSupportedOutput(mVideoStream->enc->pix_fmt);
+                throwOnCondition(okOut < 0, "Bad conversion output pixel format");
+                
+                mVideoStream->sws_ctx = sws_getContext(mFormat.width, mFormat.height, TMP_PIX_FMT,
+                                                       enc->width , enc->height, enc->pix_fmt,
+                                                       SWS_BICUBIC, nullptr, nullptr, nullptr);
+                
+                THROW_ON_NULL(mVideoStream->sws_ctx, "Could not create scaling context");
+            }
+            
+            // Copy the surface to the temp frame
+            auto srcFrame = mVideoStream->tmp_frame;
+            cpySurfaceToFrame(srcFrame, surface);
+            
+            // Put them into the output frame
+            auto ret = sws_scale(mVideoStream->sws_ctx, (const uint8_t * const *) srcFrame->data,
+                      srcFrame->linesize, 0, enc->height, dstFrame->data, dstFrame->linesize);
+            
+            throwOnCondition(ret < 0, "Could not convert frame");
+        }
+        else
+        {
+            cpySurfaceToFrame(dstFrame, surface);
+        }
+        
+        dstFrame->pts = mVideoStream->next_pts++;
+    }
+    
+    void MovieWriter::addFrame(const cinder::Surface& surface)
     {
         assertOpen();
         
-        cpyToFrame(data, bytes, pixelFormat);
+        auto ret = av_frame_make_writable(mVideoStream->frame);
+        throwOnCondition(ret < 0, "Could not make frame writable");
+        
+        cpyToFrame(surface);
         encodeFrame();
     }
+#endif
     
     static void closeStream(OutputStreamRef ost)
     {
@@ -151,6 +213,7 @@ namespace jp
         av_frame_free(&ost->tmp_frame);
         sws_freeContext(ost->sws_ctx);
         swr_free(&ost->swr_ctx);
+        av_packet_unref(ost->pkt);
     }
     
     void MovieWriter::close()
@@ -274,7 +337,7 @@ namespace jp
                 c->time_base = stream->st->time_base;
                 
                 c->gop_size = 12; // emit one intra frame every twelve frames at most
-                c->pix_fmt = mFormat.pixelFormat;
+                c->pix_fmt = STREAM_PIX_FMT;
                 if (c->codec_id == AV_CODEC_ID_MPEG2VIDEO)
                 {
                     // Just for testing, we also add B-frames
@@ -307,8 +370,8 @@ namespace jp
         picture->format = pix_fmt;
         picture->width  = width;
         picture->height = height;
-        
-        /* allocate the buffers for the frame data */
+
+        // Allocate the buffers for the frame data
         auto ret = av_frame_get_buffer(picture, 32);
         throwOnCondition(ret < 0, "Could not allocate frame data");
 
@@ -322,26 +385,36 @@ namespace jp
         auto c = mVideoStream->enc;
         auto codec = c->codec;
         
-        auto ret = avcodec_open2(c, codec, nullptr);
+        AVDictionary* opt = nullptr;
+        for (const auto& kv : mFormat.videoOptions)
+        {
+            av_dict_set(&opt, kv.first.c_str(), kv.second.c_str(), 0);
+        }
+        
+        auto ret = avcodec_open2(c, codec, &opt);
         throwOnCondition(ret < 0, "Could not open video codec");
         
         // Allocate and init a re-usable frame
         mVideoStream->frame = allocFrame(c->pix_fmt, c->width, c->height);
         THROW_ON_NULL(mVideoStream->frame, "Could not allocate video frame");
         
-        /* If the output format is not YUV420P, then a temporary YUV420P
+        /* If the output format is not the same as the user supplied, then a temporary
          * picture is needed too. It is then converted to the required
          * output format. */
         mVideoStream->tmp_frame = NULL;
-        if (c->pix_fmt != mFormat.pixelFormat)
+        if (c->pix_fmt != TMP_PIX_FMT)
         {
-            mVideoStream->tmp_frame = allocFrame(mFormat.pixelFormat, c->width, c->height);
+            mVideoStream->tmp_frame = allocFrame(TMP_PIX_FMT, c->width, c->height);
             THROW_ON_NULL(mVideoStream->tmp_frame, "Could not allocate temporary image");
         }
         
         // Copy the stream parameters to the muxer
         ret = avcodec_parameters_from_context(mVideoStream->st->codecpar, c);
         throwOnCondition(ret < 0, "Could not copy the stream parameters");
+        
+        // Alloc packet
+        mVideoStream->pkt = av_packet_alloc();
+        THROW_ON_NULL(mVideoStream->pkt, "Could not create packet");
         
         mVideoStream->next_pts = 0;
     }
