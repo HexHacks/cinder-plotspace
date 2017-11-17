@@ -59,7 +59,7 @@ namespace jp
             Options videoOptions;
             
             Format() :
-                videoCodec(AV_CODEC_ID_H264),
+                videoCodec(AV_CODEC_ID_HEVC),
                 framesPerSecond(30),
                 width(512),
                 height(523)
@@ -72,7 +72,7 @@ namespace jp
         MovieWriter();
         ~MovieWriter();
         
-        static Format getHighQualityH264Format();
+        static Format getHighQualityHEVCFormat();
         
         static MovieWriterRef create(const path& path, const Format& format);
         

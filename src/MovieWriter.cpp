@@ -97,11 +97,12 @@ namespace jp
         return ret;
     }
     
-    MovieWriter::Format MovieWriter::getHighQualityH264Format()
+    MovieWriter::Format MovieWriter::getHighQualityHEVCFormat()
     {
         Format out;
-        out.videoCodec = AV_CODEC_ID_H264;
-        out.options[""] = "";
+        out.videoCodec = AV_CODEC_ID_HEVC;
+        out.videoOptions["crf"] = "0";
+        return out;
     }
     
     void MovieWriter::encodeFrame()
