@@ -61,6 +61,7 @@
 		16FA3B781FBC40D400815F08 /* libpostproc.54.7.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpostproc.54.7.100.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libpostproc.54.7.100.dylib; sourceTree = "<group>"; };
 		16FA3B791FBC40D400815F08 /* libswresample.2.9.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libswresample.2.9.100.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libswresample.2.9.100.dylib; sourceTree = "<group>"; };
 		16FA3B7A1FBC40D400815F08 /* libswscale.4.8.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libswscale.4.8.100.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libswscale.4.8.100.dylib; sourceTree = "<group>"; };
+		16FA3B831FBF572000815F08 /* JUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JUtil.h; path = ../include/JUtil.h; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		2E720DBFF4264E9CAEF1D2E2 /* Resources.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Resources.h; path = ../include/Resources.h; sourceTree = "<group>"; };
@@ -187,6 +188,7 @@
 				9B73EBAA23A94822A8FD4F98 /* PlotSpace_Prefix.pch */,
 				16E0EBBA1FB700060018285F /* AppMovieCapture.h */,
 				16E0EBC31FB9CADF0018285F /* MovieWriter.h */,
+				16FA3B831FBF572000815F08 /* JUtil.h */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
