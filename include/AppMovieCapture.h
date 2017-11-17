@@ -11,6 +11,7 @@
 #include <exception>
 #include "cinder/app/App.h"
 #include "MovieWriter.h"
+#include "JUtil.h"
 
 #ifndef AppMovieCapture_h
 #define AppMovieCapture_h
@@ -35,7 +36,13 @@ class AppMovieCapture
     
 public:
     
-    AppMovieCapture(App* app): mMov(nullptr), mApp(app), mAutoFinish(-1), mFrame(0), mRenewPath(true)
+    AppMovieCapture(App* app):
+        mMov(nullptr),
+        mApp(app),
+        mAutoFinish(-1),
+        mFrame(0),
+        mRenewPath(true),
+        mFormat(MovieWriter::getHighQualityHEVCFormat())
     {
         mPath = ensureTmpPath();
     }
@@ -46,29 +53,12 @@ public:
         return std::make_shared<AppMovieCapture>(app);
     }
     
-    path ensureTmpPath(const std::string ext = "mkv") const
+    path ensureTmpPath(const std::string& ext = "mkv") const
     {
         auto fold = mApp->getAssetPath("");
         auto outd = fold / "output";
-        auto o = outd / (boost::format("capture_0.%1%") % ext).str();
-        if (!::ci::fs::exists(outd))
-        {
-            ::ci::fs::create_directory(outd);
-        }
-        else if (::ci::fs::is_directory(outd))
-        {
-            int i = 0;
-            while (::ci::fs::exists(o))
-            {
-                o = outd / (boost::format("capture_%1%.%2%") % i++ % ext).str();
-            }
-        }
-        else
-        {
-            throw std::exception();
-        }
         
-        return o;
+        return jp::ensureTmpOutput(outd, ext);
     }
     
     /////// The internal state only effects next start
@@ -134,15 +124,23 @@ public:
         mMov = MovieWriter::create(mPath, mFormat);
     }
     
-    void captureFrame()
+    void addFrame(const ::ci::Surface& surface)
     {
         if (mMov)
         {
-            mMov->addFrame(mApp->copyWindowSurface());
+            mMov->addFrame(surface);
             
             mFrame++;
             if (mFrame >= mAutoFinish)
                 finish();
+        }
+    }
+    
+    void captureFrame()
+    {
+        if (mMov)
+        {
+            addFrame(mApp->copyWindowSurface());
         }
     }
     
