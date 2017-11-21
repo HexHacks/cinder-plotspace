@@ -42,7 +42,7 @@ public:
         mAutoFinish(-1),
         mFrame(0),
         mRenewPath(true),
-        mFormat(MovieWriter::getHighQualityHEVCFormat())
+        mFormat()
     {
         mPath = ensureTmpPath();
     }
@@ -115,13 +115,18 @@ public:
     
     void start()
     {
+        mFormat.width = mApp->getWindowWidth();
+        mFormat.height = mApp->getWindowHeight();
+        start(mFormat);
+    }
+    
+    void start(const MovieWriter::Format& format)
+    {
         mFrame = 0;
         if (mRenewPath)
             mPath = ensureTmpPath();
         
-        mFormat.width = mApp->getWindowWidth();
-        mFormat.height = mApp->getWindowHeight();
-        mMov = MovieWriter::create(mPath, mFormat);
+        mMov = MovieWriter::create(mPath, format);
     }
     
     void addFrame(const ::ci::Surface& surface)
