@@ -4,11 +4,14 @@
 #include "cinder/CameraUi.h"
 #include "cinder/params/Params.h"
 #include "cinder/CinderMath.h"
+#include "cinder/Perlin.h"
 
 #include "LineSpace.h"
 #include "AppMovieCapture.h"
 
 #include "smaa/SMAA.h"
+
+#include <cmath>
 
 using namespace ci;
 using namespace ci::app;
@@ -31,9 +34,13 @@ class PlotSpaceApp : public App {
     vec3 mSize;
     vec3 mDivs;
     
+    Perlin mPerlin;
+    
     gl::FboRef mFboScene;
     gl::FboRef mFboFinal;
     gl::TextureRef mFrameTex;
+    
+    jp::MovieWriter::Format mMovFormat;
     
     SMAA mSMAA;
     
@@ -48,12 +55,12 @@ class PlotSpaceApp : public App {
     void resetSpace();
     void calcSpace();
     vec3 func(const ivec3& idx, const vec3& pos);
-    vec4 col(const ivec3& idx, const vec3& pos);
+    vec4 col(const ivec3& idx, const vec3& pos, const vec3& npos);
     
     void prepareSettings( Settings *settings )
     {
         settings->setHighDensityDisplayEnabled();
-        settings->setWindowSize( 700, 700 );
+        settings->setWindowSize( 1024, 1024 );
     }
     
     void resize() override
@@ -69,14 +76,16 @@ class PlotSpaceApp : public App {
         mFboScene = gl::Fbo::create( getWindowWidth(), getWindowHeight(), fmt );
         mFboFinal = gl::Fbo::create( getWindowWidth(), getWindowHeight(), fmt );
         
+        mMovFormat.width = getWindowWidth();
+        mMovFormat.height = getWindowHeight();
+        
         mCam.setAspectRatio(getWindowAspectRatio());
     }
     
     void startRec()
     {
-        // 5 secs
         mMov->setAutoFinish(mRecFrames);
-        mMov->start();
+        mMov->start(mMovFormat);
     }
     
     void setupParams()
@@ -89,20 +98,12 @@ class PlotSpaceApp : public App {
             .keyIncr("+")
             .keyDecr("-")
             .updateFn([this](){ calcSpace(); });
-        
-        auto updateSpaceFun = [this]()
-        {
-            mSpace = LineSpace::create(mSize, vec3(mDivs));
-        };
 
         mParams->addParam("Animate", &mAnimate).key("a");
         mParams->addParam("SMAA", &mUseSmaa).key("s");
         mParams->addSeparator();
         mParams->addParam("Rec frames", &mRecFrames);
         mParams->addButton("Record", [this](){ startRec(); }, "key=r");
-        mParams->addSeparator();
-        mParams->addParam("Size", &mSize).updateFn(updateSpaceFun);
-        mParams->addParam("Divs", &mDivs).updateFn(updateSpaceFun);
         mParams->addSeparator();
         mParams->addParam("S/H Frame", &mShowFrame).key("f");
         mParams->addParam("S/H Params", &mShowParams).key("p");
@@ -118,18 +119,24 @@ void PlotSpaceApp::setup()
     gl::enableDepthRead();
     gl::enableDepthWrite();
     gl::enableVerticalSync();
-    gl::disableAlphaBlending();
+    gl::enableAlphaBlending();
+    //gl::disableAlphaBlending();
+    
+    setWindowSize(1080, 712);
     
     mT = 0.;
     mAnimate = false;
     mShowFrame = true;
     mShowParams = true;
     mUseSmaa = false;
-    mRecFrames = 30 * 5; // 5 secs
+    mRecFrames = 50;
     mSize = vec3(10.f);
     mDivs = ivec3(20);
     
+    mMovFormat = jp::MovieWriter::getHighQualityFormat(AV_CODEC_ID_HEVC, 30, getWindowWidth(), getWindowHeight());
+    
     mMov = AppMovieCapture::create(this);
+    
     mSpace = LineSpace::create(mSize, vec3(mDivs));
     
     mCam.lookAt(vec3(0.f, 3.f, 3.f), vec3(0.f));
@@ -166,26 +173,50 @@ static mat4 m4(float aa, float ab, float ac, float ad,
 
 vec3 PlotSpaceApp::func(const ivec3& idx, const vec3& pos)
 {
+    auto a = 0.3;
+    auto f = 0.1;
     auto T = m4(1., 0., 0., 0.,
                 0., 1., 0., 0.,
                 0., 0., 1., 0.,
-                0.5*sin(mT), 0., 0., 1);//0.1*sin(pos.x+mT), 0.1*cos(pos.y*pos.z+mT), 0., 1.);
+                a*sin(f*pos.x+f*mT), a*cos(f*pos.y*pos.z+f*mT), a*0.1*sin(f*mT), 1.);
 
     
     return v3(T * v4(pos));
 }
 
-vec4 PlotSpaceApp::col(const ivec3& idx, const vec3& pos)
+inline float sn(float x)
 {
-    vec4 col(1.);
-    float outer = length(mSpace->getSize()) * 0.5f;
-    float rad = length(pos) / outer;
+    return sin(x) * 0.5 + 0.5;
+}
+
+inline float d(float x)
+{
+    auto s = sn(x);
+    return 1. - s*s;
+}
+
+inline float dd(float x)
+{
+    auto s = sn(x);
+    return s*s;
+}
+
+inline float sigmoid(float x)
+{
+    float xp = exp(x);
+    return xp / (xp + 1.f);
+}
+
+vec4 PlotSpaceApp::col(const ivec3& idx, const vec3& pos, const vec3& npos)
+{
+    float lx = npos.x - pos.x;
+    float ly = npos.y - pos.y;
+    float lz = npos.z - pos.z;
+    float sx = 0.7f * sigmoid(lx * 0.5f) + 0.3;
+    float sy = 0.5f * sigmoid(ly * 0.5f) + 0.5;
+    float sz = 0.8f * sigmoid(lz * 0.5f) + 0.2;
     
-    col.r = 1.f-rad;
-    col.g = math<float>::clamp(1.f/(rad*rad+1.f), 0.f, 1.f);
-    col.w = rad;
-    
-    return col;
+    return vec4(sx, sy, sz, 1.f);
 }
 
 void PlotSpaceApp::resetSpace()
@@ -219,8 +250,9 @@ void PlotSpaceApp::calcSpace()
         auto idx = mSpace->getIdxFromFlat(i);
         auto pos = mSpace->standardFunc(idx);
         
-        *posIter = func(idx, pos);
-        *colIter = col(idx, pos);
+        auto f = func(idx, pos);
+        *posIter = f;
+        *colIter = col(idx, pos, f);
         
         posIter++;
         colIter++;
@@ -230,12 +262,31 @@ void PlotSpaceApp::calcSpace()
     posIter.unmap();
 }
 
+static vec3 cone(float t, float diam, float length, float x)
+{
+    auto at = (sin(t) * 0.5 + 0.5);
+    auto al = at * length;
+    auto amp = diam * (1.f-at) / length;
+    return vec3(x + al, amp*cos(t), amp*sin(t));
+}
+
 void PlotSpaceApp::update()
 {
+    if (mMov->isCapturing())
+    {
+        auto title = (boost::format("Frame: %1% of %2%") % (mMov->getCurrentFrame() + 1) % mRecFrames).str();
+        getWindow()->setTitle(title);
+    }
+    
     if (mAnimate)
     {
         auto s = getElapsedFrames() / float(mMov->getFps());
         mT = 5.f*(sin(s)+1.f);
+        
+        auto eye = cone(s*0.5, 4., 4., 7.);
+        auto at = cone(s*0.08-s, 2., 3., 0.);
+        mCam.lookAt(eye, at);
+        
         calcSpace();
     }
 }
@@ -247,13 +298,16 @@ void PlotSpaceApp::draw()
     gl::clear();
     gl::color( Color::white() );
     
+    gl::FboRef fbo;
     if (mUseSmaa)
     {
         mSMAA.apply( mFboFinal, mFboScene );
-        mFrameTex = mFboFinal->getColorTexture();
+        fbo = mFboFinal;
     }
     else
-        mFrameTex = mFboScene->getColorTexture();
+        fbo = mFboScene;
+    
+    mFrameTex = fbo->getColorTexture();
     
     {
         gl::ScopedMatrices scpMat;
@@ -263,7 +317,10 @@ void PlotSpaceApp::draw()
     
     if (mMov->isCapturing())
     {
-        mMov->captureFrame();
+        auto surf = fbo->readPixels8u(getWindowBounds());
+        //auto dir = getAssetPath("output");
+        //writeImage(jp::ensureTmpOutput(dir, "png"), surf);
+        mMov->addFrame(surf);
     }
 }
 
