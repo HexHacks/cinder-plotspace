@@ -33,6 +33,7 @@ extern "C" {
 #endif
 
 struct AVFormatContext;
+struct AVFrame;
 
 namespace jp
 {
@@ -72,7 +73,7 @@ namespace jp
         MovieWriter();
         ~MovieWriter();
         
-        static Format getHighQualityHEVCFormat();
+        static Format getHighQualityFormat(AVCodecID codec, int fps = 30, int width = 512, int height = 512);
         
         static MovieWriterRef create(const path& path, const Format& format);
         
@@ -97,13 +98,17 @@ namespace jp
         void allocContext();
         void allocStreamCommon(OutputStreamRef stream, AVCodecID codecId);
         void allocVideoStream();
+        AVFrame* allocFrame(enum AVPixelFormat pix_fmt, int width, int height);
         void openVideoStream();
         void writeHeader();
         
 #ifdef USE_CINDER
         void cpyToFrame(const cinder::Surface& surface);
 #endif
-        void encodeFrame();
+        void encodeFrame(OutputStreamRef stream);
+        void flushEncoder(OutputStreamRef stream);
+        
+        void writeFrame(OutputStreamRef stream);
     };
 }
 

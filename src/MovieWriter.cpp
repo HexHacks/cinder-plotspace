@@ -70,6 +70,7 @@ namespace jp
         if (!initialized)
         {
             // Initialize libavcodec, and register all codecs and formats.
+            avcodec_register_all();
             av_register_all();
             
             initialized = true;
@@ -97,37 +98,79 @@ namespace jp
         return ret;
     }
     
-    MovieWriter::Format MovieWriter::getHighQualityHEVCFormat()
+    MovieWriter::Format MovieWriter::getHighQualityFormat(AVCodecID codec, int fps, int width, int height)
     {
         Format out;
-        out.videoCodec = AV_CODEC_ID_HEVC;
-        out.videoOptions["crf"] = "0";
+        out.videoCodec = codec;
+        out.framesPerSecond = fps;
+        out.width = width;
+        out.height = height;
+        
+        switch (codec)
+        {
+            case AV_CODEC_ID_H264:
+            case AV_CODEC_ID_HEVC:
+                out.videoOptions["preset"] = "veryfast";
+                out.videoOptions["crf"] = "17";
+                break;
+                
+            default:
+                break;
+        }
+        
         return out;
     }
     
-    void MovieWriter::encodeFrame()
+    void MovieWriter::writeFrame(OutputStreamRef stream)
     {
-        auto ret = avcodec_send_frame(mVideoStream->enc, mVideoStream->frame);
+        // Rescale output packet timestamp values from codec to stream timebase
+        av_packet_rescale_ts(stream->pkt, stream->enc->time_base, mVideoStream->st->time_base);
+        stream->pkt->stream_index = stream->st->index;
+        
+        // Write to disk
+        auto ret = av_interleaved_write_frame(mContext, stream->pkt);
+        throwOnCondition(ret < 0 , "Error writing frame");
+    }
+    
+    void MovieWriter::encodeFrame(OutputStreamRef stream)
+    {
+        auto ret = avcodec_send_frame(stream->enc, stream->frame);
         throwOnCondition(ret < 0, "Error encoding video frame");
         
-        auto encoder = mVideoStream->enc;
-        auto pkt = mVideoStream->pkt;
-        auto stream = mVideoStream->st;
+        auto enc = stream->enc;
+        auto pkt = stream->pkt;
         while (ret >= 0)
         {
-            ret = avcodec_receive_packet(encoder, pkt);
+            ret = avcodec_receive_packet(enc, pkt);
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
                 return;
             else if (ret < 0)
                 throw std::runtime_error("Error while encoding");
             
-            // Rescale output packet timestamp values from codec to stream timebase
-            av_packet_rescale_ts(pkt, encoder->time_base, stream->time_base);
-            pkt->stream_index = stream->index;
+            writeFrame(stream);
             
-            // Write to disk
-            ret = av_interleaved_write_frame(mContext, pkt);
-            throwOnCondition(ret < 0 , "Error writing frame");
+            av_packet_unref(pkt);
+        }
+    }
+    
+    void MovieWriter::flushEncoder(OutputStreamRef stream)
+    {
+        auto enc = mVideoStream->enc;
+        
+        // Set drainage/flush mode with nullptr
+        auto ret = avcodec_send_frame(enc, nullptr);
+        throwOnCondition(ret < 0, "Could not enter drainage flush mode");
+        
+        auto pkt = stream->pkt;
+        while (ret >= 0)
+        {
+            ret = avcodec_receive_packet(enc, pkt);
+            if (ret == AVERROR_EOF)
+                break;
+            else if (ret < 0)
+                throw std::runtime_error("Error receiving packet while flushing encoder");
+            
+            writeFrame(stream);
             av_packet_unref(pkt);
         }
     }
@@ -203,7 +246,7 @@ namespace jp
         throwOnCondition(ret < 0, "Could not make frame writable");
         
         cpyToFrame(surface);
-        encodeFrame();
+        encodeFrame(mVideoStream);
     }
 #endif
     
@@ -221,6 +264,8 @@ namespace jp
     {
         if (!mContext)
             return;
+        
+        flushEncoder(mVideoStream);
         
         // Done before closing streams.
         av_write_trailer(mContext);
@@ -337,7 +382,8 @@ namespace jp
                 stream->st->time_base = (AVRational){ 1, mFormat.framesPerSecond };
                 c->time_base = stream->st->time_base;
                 
-                c->gop_size = 12; // emit one intra frame every twelve frames at most
+                c->gop_size = 10; // emit one intra frame gop_size frames
+                c->max_b_frames = 1;
                 c->pix_fmt = STREAM_PIX_FMT;
                 if (c->codec_id == AV_CODEC_ID_MPEG2VIDEO)
                 {
@@ -362,7 +408,7 @@ namespace jp
             c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
     }
     
-    static AVFrame* allocFrame(enum AVPixelFormat pix_fmt, int width, int height)
+    AVFrame* MovieWriter::allocFrame(enum AVPixelFormat pix_fmt, int width, int height)
     {
         auto picture = av_frame_alloc();
         if (!picture)
@@ -371,6 +417,7 @@ namespace jp
         picture->format = pix_fmt;
         picture->width  = width;
         picture->height = height;
+        picture->quality = mVideoStream->st->codec->global_quality;
 
         // Allocate the buffers for the frame data
         auto ret = av_frame_get_buffer(picture, 32);
