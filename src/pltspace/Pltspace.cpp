@@ -34,6 +34,7 @@ namespace jp
     };
     
     Pltspace::Pltspace(ContextRef ctx) :
+        Scene(ctx),
         mImpl(new PltspaceImpl(ctx))
     {
     }
@@ -50,6 +51,14 @@ namespace jp
     void Pltspace::update()
     {
         mImpl->update();
+    }
+    void Pltspace::activate()
+    {
+        
+    }
+    void Pltspace::deactivate()
+    {
+        
     }
     void Pltspace::draw()
     {

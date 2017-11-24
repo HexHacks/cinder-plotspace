@@ -9,7 +9,7 @@
 #ifndef Wavygrass_h
 #define Wavygrass_h
 
-#include "Context.h"
+#include "Scene.h"
 #include <memory>
 
 namespace  jp
@@ -19,23 +19,26 @@ namespace  jp
     class Wavygrass;
     using WavygrassRef = std::shared_ptr<Wavygrass>;
     
-    class Wavygrass
+    class Wavygrass : public Scene
     {
         WavygrassImpl* mImpl;
         
     public:
         
         Wavygrass(ContextRef ctx);
-        ~Wavygrass();
+        virtual ~Wavygrass();
         
         static WavygrassRef create(ContextRef ctx)
         {
             return std::make_shared<Wavygrass>(ctx);
         }
         
-        void setup();
-        void update();
-        void draw();
+        virtual std::string getName() override { return "Wavygrass"; }
+        virtual void setup() override;
+        virtual void activate() override;
+        virtual void deactivate() override;
+        virtual void update() override;
+        virtual void draw() override;
     };
 }
 

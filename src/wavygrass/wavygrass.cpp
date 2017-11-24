@@ -169,6 +169,7 @@ class WavygrassImpl
 };
     
     Wavygrass::Wavygrass(ContextRef ctx) :
+        Scene(ctx),
         mImpl(new WavygrassImpl(ctx))
     {
     }
@@ -182,6 +183,16 @@ class WavygrassImpl
     {
         mImpl->setup();
     }
+    
+    void Wavygrass::activate()
+    {
+    }
+    
+    void Wavygrass::deactivate()
+    {
+        
+    }
+    
     void Wavygrass::update()
     {
         mImpl->update();
@@ -249,7 +260,9 @@ void jp::WavygrassImpl::update()
 
 void jp::WavygrassImpl::draw()
 {
-	gl::clear( Color( 0.2, 0.2, 0.2 ) );
+    gl::ScopedColor scpCol;
+    gl::ScopedBlend scpBlnd(GL_SRC_ALPHA, GL_ONE);
+    
     gl::setMatrices(mCtx->cam);
     //gl::enableDepth();
     //gl::enableFaceCulling();
@@ -259,14 +272,14 @@ void jp::WavygrassImpl::draw()
     float t = getElapsedSeconds();
     createTree(t);
     
-    gl::enableAdditiveBlending();
     int w = 10;
     int h = 10;
     for (int y = 0; y < h; y++)
     {
         for(int x = 0; x < w; x++)
         {
-            gl::pushModelView();
+            gl::ScopedModelMatrix scpMM;
+            
             auto at = vec3(x-(w-1)/2.f, 0, y-(h-1)/2.f) * 3.f;
             gl::translate(at);
             
@@ -277,7 +290,6 @@ void jp::WavygrassImpl::draw()
             auto yy = 0.5*y / float(h);
             gl::color(ColorA(Colorf(ColorModel::CM_HSV, xx+yy, 0.7, 0.7), 0.25f));
             gl::draw(*mTriMesh);
-            gl::popModelView();
         }
     }
 }

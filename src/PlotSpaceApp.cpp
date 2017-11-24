@@ -21,13 +21,15 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-using Scene = jp::Pltspace;
-using SceneRef = std::shared_ptr<Scene>;
 
 class PlotSpaceApp : public App {
+    using SceneVec = std::vector<jp::SceneRef>;
+    
     jp::ContextRef mCtx;
     
-    SceneRef mScene;
+    SceneVec mScenes;
+    int mPrevScene;
+    int mActiveScene;
     
     AppMovieCaptureRef mMov;
     
@@ -47,7 +49,6 @@ class PlotSpaceApp : public App {
     SMAA mSMAA;
     
   public:
-    
     
 	void setup() override;
 	void mouseDown( MouseEvent event ) override;
@@ -109,6 +110,21 @@ class PlotSpaceApp : public App {
             .keyIncr("+")
             .keyDecr("-")
             .updateFn([this](){ calcSpace(); });*/
+        
+        
+        auto changeScene = [this]()
+        {
+            mScenes[mPrevScene]->deactivate();
+            mScenes[mActiveScene]->activate();
+            mPrevScene = mActiveScene;
+        };
+        
+        mCtx->params->addParam("Scene", &mActiveScene)
+        .min(0)
+        .max(mScenes.size()-1)
+        .keyIncr("+")
+        .keyDecr("-")
+        .updateFn(changeScene);
 
         auto timeReset = [this]()
         {
@@ -135,6 +151,7 @@ void PlotSpaceApp::setup()
     gl::enableDepthRead();
     gl::enableDepthWrite();
     gl::enableVerticalSync();
+    //gl::disableAlphaBlending();
     
     setWindowSize(742, 742);
     
@@ -144,6 +161,11 @@ void PlotSpaceApp::setup()
     mCtx->camUi = CameraUi(&mCtx->cam, getWindow());
     mCtx->screenSize = getWindowSize();
     
+    mScenes = {
+        jp::Pltspace::create(mCtx),
+        jp::Wavygrass::create(mCtx)
+    };
+    
     resetTime();
     setupParams();
     
@@ -152,8 +174,12 @@ void PlotSpaceApp::setup()
     mUseSmaa = false;
     mRecFrames = 430;
     
-    mScene = Scene::create(mCtx);
-    mScene->setup();
+    // Setup scenes after params
+    for (auto s : mScenes)
+        s->setup();
+    
+    mPrevScene = mActiveScene = mScenes.size() - 1;
+    mScenes[mActiveScene]->activate();
     
     mMovFormat = jp::MovieWriter::getHighQualityFormat(AV_CODEC_ID_HEVC, 30, getWindowWidth(), getWindowHeight());
     
@@ -173,7 +199,7 @@ void PlotSpaceApp::update()
     }
     else
     {
-        getWindow()->setTitle("Preview mode");
+        getWindow()->setTitle(mScenes[mActiveScene]->getName());
     }
     
     mCtx->frame = 0;
@@ -189,7 +215,7 @@ void PlotSpaceApp::update()
         }
     }
     
-    mScene->update();
+    mScenes[mActiveScene]->update();
 }
 
 void PlotSpaceApp::draw()
@@ -236,7 +262,7 @@ void PlotSpaceApp::renderScene()
     gl::ScopedViewport scpViewport(0, 0, mFboScene->getWidth(), mFboScene->getHeight());
     gl::setMatrices(mCtx->cam);
     
-    mScene->draw();
+    mScenes[mActiveScene]->draw();
     
     if (!mMov->isCapturing())
     {

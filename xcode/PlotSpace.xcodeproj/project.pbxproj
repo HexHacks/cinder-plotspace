@@ -51,6 +51,7 @@
 		16209A621FC72C6E00A2C9D1 /* Context.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Context.h; path = ../include/Context.h; sourceTree = "<group>"; };
 		16209A641FC751B500A2C9D1 /* Pltspace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Pltspace.h; path = ../include/pltspace/Pltspace.h; sourceTree = "<group>"; };
 		16209A661FC7520800A2C9D1 /* Pltspace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Pltspace.cpp; path = ../src/pltspace/Pltspace.cpp; sourceTree = "<group>"; };
+		16209A681FC82DEE00A2C9D1 /* Scene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Scene.h; path = ../include/Scene.h; sourceTree = "<group>"; };
 		16E0EBB91FB5FEFE0018285F /* LineSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LineSpace.h; path = ../include/LineSpace.h; sourceTree = "<group>"; };
 		16E0EBBA1FB700060018285F /* AppMovieCapture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppMovieCapture.h; path = ../include/AppMovieCapture.h; sourceTree = "<group>"; };
 		16E0EBBD1FB8806A0018285F /* AreaTex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AreaTex.h; path = ../src/smaa/AreaTex.h; sourceTree = "<group>"; };
@@ -233,6 +234,7 @@
 				16E0EBC31FB9CADF0018285F /* MovieWriter.h */,
 				16FA3B831FBF572000815F08 /* JUtil.h */,
 				16209A621FC72C6E00A2C9D1 /* Context.h */,
+				16209A681FC82DEE00A2C9D1 /* Scene.h */,
 			);
 			name = Headers;
 			sourceTree = "<group>";

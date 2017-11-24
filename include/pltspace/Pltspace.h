@@ -9,8 +9,8 @@
 #ifndef Pltspace_h
 #define Pltspace_h
 
-#include "Context.h"
 #include <memory>
+#include "Scene.h"
 
 namespace  jp
 {
@@ -19,23 +19,26 @@ namespace  jp
     class Pltspace;
     using PltspaceRef = std::shared_ptr<Pltspace>;
     
-    class Pltspace
+    class Pltspace : public Scene
     {
         PltspaceImpl* mImpl;
         
     public:
         
         Pltspace(ContextRef ctx);
-        ~Pltspace();
+        virtual ~Pltspace();
         
         static PltspaceRef create(ContextRef ctx)
         {
             return std::make_shared<Pltspace>(ctx);
         }
         
-        void setup();
-        void update();
-        void draw();
+        virtual std::string getName() override { return "Pltspace"; }
+        virtual void setup() override;
+        virtual void activate() override;
+        virtual void deactivate() override;
+        virtual void update() override;
+        virtual void draw() override;
     };
 }
 
