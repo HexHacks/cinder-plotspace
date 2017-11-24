@@ -13,28 +13,30 @@
 
 #include <cmath>
 
+#include "Context.h"
+#include "wavygrass/Wavygrass.h"
+#include "pltspace/Pltspace.h"
+
 using namespace ci;
 using namespace ci::app;
 using namespace std;
 
+using Scene = jp::Pltspace;
+using SceneRef = std::shared_ptr<Scene>;
+
 class PlotSpaceApp : public App {
-    CameraPersp mCam;
-    CameraUi mCamUi;
-    params::InterfaceGlRef mParams;
+    jp::ContextRef mCtx;
     
-    LineSpaceRef mSpace;
+    SceneRef mScene;
+    
     AppMovieCaptureRef mMov;
     
-    float mT;
-    bool mAnimate;
     bool mShowParams;
     bool mShowFrame;
     bool mUseSmaa;
     unsigned int mRecFrames;
-    vec3 mSize;
-    vec3 mDivs;
     
-    Perlin mPerlin;
+    int mStartFrame;
     
     gl::FboRef mFboScene;
     gl::FboRef mFboFinal;
@@ -45,6 +47,8 @@ class PlotSpaceApp : public App {
     SMAA mSMAA;
     
   public:
+    
+    
 	void setup() override;
 	void mouseDown( MouseEvent event ) override;
 	void update() override;
@@ -52,15 +56,9 @@ class PlotSpaceApp : public App {
     
     void renderScene();
     
-    void resetSpace();
-    void calcSpace();
-    vec3 func(const ivec3& idx, const vec3& pos);
-    vec4 col(const ivec3& idx, const vec3& pos, const vec3& npos);
-    
     void prepareSettings( Settings *settings )
     {
         settings->setHighDensityDisplayEnabled();
-        settings->setWindowSize( 1024, 1024 );
     }
     
     void resize() override
@@ -76,38 +74,56 @@ class PlotSpaceApp : public App {
         mFboScene = gl::Fbo::create( getWindowWidth(), getWindowHeight(), fmt );
         mFboFinal = gl::Fbo::create( getWindowWidth(), getWindowHeight(), fmt );
         
+        mCtx->screenSize.x =
         mMovFormat.width = getWindowWidth();
+        
+        mCtx->screenSize.y =
         mMovFormat.height = getWindowHeight();
         
-        mCam.setAspectRatio(getWindowAspectRatio());
+        mCtx->cam.setAspectRatio(getWindowAspectRatio());
+    }
+    
+    void resetTime()
+    {
+        mStartFrame = getElapsedFrames();
+        mCtx->t = 0.f;
+        mCtx->frame = 0;
     }
     
     void startRec()
     {
+        resetTime();
+        mCtx->animate = true;
+        
         mMov->setAutoFinish(mRecFrames);
         mMov->start(mMovFormat);
     }
     
     void setupParams()
     {
-        mParams = params::InterfaceGl::create( getWindow(), "Parameters", ivec2( 200, 200 ) );
-        mParams->addParam("T", &mT)
+        mCtx->params = params::InterfaceGl::create( getWindow(), "Parameters", ivec2( 200, 200 ) );
+        /*mCtx->params->addParam("T", &mT)
             .min(0.0)
             .max(10.0)
             .step(0.1)
             .keyIncr("+")
             .keyDecr("-")
-            .updateFn([this](){ calcSpace(); });
+            .updateFn([this](){ calcSpace(); });*/
 
-        mParams->addParam("Animate", &mAnimate).key("a");
-        mParams->addParam("SMAA", &mUseSmaa).key("s");
-        mParams->addSeparator();
-        mParams->addParam("Rec frames", &mRecFrames);
-        mParams->addButton("Record", [this](){ startRec(); }, "key=r");
-        mParams->addSeparator();
-        mParams->addParam("S/H Frame", &mShowFrame).key("f");
-        mParams->addParam("S/H Params", &mShowParams).key("p");
-        mParams->addButton("Reset", [this](){ resetSpace(); }, "key=c");
+        auto timeReset = [this]()
+        {
+            resetTime();
+        };
+        
+        mCtx->params->addParam("Animate", &mCtx->animate).key("a");
+        mCtx->params->addParam("SMAA", &mUseSmaa).key("s");
+        mCtx->params->addSeparator();
+        mCtx->params->addParam("Rec frames", &mRecFrames).updateFn(timeReset);
+        mCtx->params->addButton("Record", [this](){ startRec(); }, "key=r");
+        mCtx->params->addSeparator();
+        mCtx->params->addParam("S/H Frame", &mShowFrame).key("f");
+        mCtx->params->addParam("S/H Params", &mShowParams).key("p");
+        mCtx->params->addSeparator();
     }
     
 };
@@ -119,155 +135,33 @@ void PlotSpaceApp::setup()
     gl::enableDepthRead();
     gl::enableDepthWrite();
     gl::enableVerticalSync();
-    gl::enableAlphaBlending();
-    //gl::disableAlphaBlending();
     
-    setWindowSize(1080, 712);
+    setWindowSize(742, 742);
     
-    mT = 0.;
-    mAnimate = false;
+    mCtx = std::make_shared<jp::Context>();
+    mCtx->animate = false;
+    mCtx->cam.lookAt(vec3(0.f, 3.f, 3.f), vec3(0.f));
+    mCtx->camUi = CameraUi(&mCtx->cam, getWindow());
+    mCtx->screenSize = getWindowSize();
+    
+    resetTime();
+    setupParams();
+    
     mShowFrame = true;
     mShowParams = true;
     mUseSmaa = false;
-    mRecFrames = 50;
-    mSize = vec3(10.f);
-    mDivs = ivec3(20);
+    mRecFrames = 430;
+    
+    mScene = Scene::create(mCtx);
+    mScene->setup();
     
     mMovFormat = jp::MovieWriter::getHighQualityFormat(AV_CODEC_ID_HEVC, 30, getWindowWidth(), getWindowHeight());
     
     mMov = AppMovieCapture::create(this);
-    
-    mSpace = LineSpace::create(mSize, vec3(mDivs));
-    
-    mCam.lookAt(vec3(0.f, 3.f, 3.f), vec3(0.f));
-    mCamUi = CameraUi(&mCam, getWindow());
-    
-    
-    setupParams();
 }
 
 void PlotSpaceApp::mouseDown( MouseEvent event )
 {
-}
-
-static vec4 v4(const vec3& v)
-{
-    return vec4(v.x, v.y, v.z, 1.);
-}
-
-static vec3 v3(const vec4& v)
-{
-    return vec3(v.x / v.w, v.y / v.w, v.z / v.w);
-}
-
-static mat4 m4(float aa, float ab, float ac, float ad,
-               float ba, float bb, float bc, float bd,
-               float ca, float cb, float cc, float cd,
-               float da, float db, float dc, float dd)
-{
-    return mat4(aa, ba, ca, da,
-                ab, bb, cb, db,
-                ac, bc, cc, dc,
-                ad, bd, cd, dd);
-}
-
-vec3 PlotSpaceApp::func(const ivec3& idx, const vec3& pos)
-{
-    auto a = 0.3;
-    auto f = 0.1;
-    auto T = m4(1., 0., 0., 0.,
-                0., 1., 0., 0.,
-                0., 0., 1., 0.,
-                a*sin(f*pos.x+f*mT), a*cos(f*pos.y*pos.z+f*mT), a*0.1*sin(f*mT), 1.);
-
-    
-    return v3(T * v4(pos));
-}
-
-inline float sn(float x)
-{
-    return sin(x) * 0.5 + 0.5;
-}
-
-inline float d(float x)
-{
-    auto s = sn(x);
-    return 1. - s*s;
-}
-
-inline float dd(float x)
-{
-    auto s = sn(x);
-    return s*s;
-}
-
-inline float sigmoid(float x)
-{
-    float xp = exp(x);
-    return xp / (xp + 1.f);
-}
-
-vec4 PlotSpaceApp::col(const ivec3& idx, const vec3& pos, const vec3& npos)
-{
-    float lx = npos.x - pos.x;
-    float ly = npos.y - pos.y;
-    float lz = npos.z - pos.z;
-    float sx = 0.7f * sigmoid(lx * 0.5f) + 0.3;
-    float sy = 0.5f * sigmoid(ly * 0.5f) + 0.5;
-    float sz = 0.8f * sigmoid(lz * 0.5f) + 0.2;
-    
-    return vec4(sx, sy, sz, 1.f);
-}
-
-void PlotSpaceApp::resetSpace()
-{
-    auto vbo = mSpace->getVbo();
-    auto posIter = vbo->mapAttrib3f(geom::Attrib::POSITION);
-    auto colIter = vbo->mapAttrib4f(geom::Attrib::COLOR);
-    for (size_t i = 0; i < vbo->getNumVertices(); i++)
-    {
-        auto idx = mSpace->getIdxFromFlat(i);
-        auto pos = mSpace->standardFunc(idx);
-        
-        *posIter = pos;
-        *colIter = vec4(1.);
-        
-        posIter++;
-        colIter++;
-    }
-    
-    colIter.unmap();
-    posIter.unmap();
-}
-                           
-void PlotSpaceApp::calcSpace()
-{
-    auto vbo = mSpace->getVbo();
-    auto posIter = vbo->mapAttrib3f(geom::Attrib::POSITION);
-    auto colIter = vbo->mapAttrib4f(geom::Attrib::COLOR);
-    for (size_t i = 0; i < vbo->getNumVertices(); i++)
-    {
-        auto idx = mSpace->getIdxFromFlat(i);
-        auto pos = mSpace->standardFunc(idx);
-        
-        auto f = func(idx, pos);
-        *posIter = f;
-        *colIter = col(idx, pos, f);
-        
-        posIter++;
-        colIter++;
-    }
-    
-    colIter.unmap();
-    posIter.unmap();
-}
-
-static vec3 cone(float t, float diam, float length, float x)
-{
-    auto at = (sin(t) * 0.5 + 0.5);
-    auto al = at * length;
-    auto amp = diam * (1.f-at) / length;
-    return vec3(x + al, amp*cos(t), amp*sin(t));
 }
 
 void PlotSpaceApp::update()
@@ -277,18 +171,25 @@ void PlotSpaceApp::update()
         auto title = (boost::format("Frame: %1% of %2%") % (mMov->getCurrentFrame() + 1) % mRecFrames).str();
         getWindow()->setTitle(title);
     }
-    
-    if (mAnimate)
+    else
     {
-        auto s = getElapsedFrames() / float(mMov->getFps());
-        mT = 5.f*(sin(s)+1.f);
-        
-        auto eye = cone(s*0.5, 4., 4., 7.);
-        auto at = cone(s*0.08-s, 2., 3., 0.);
-        mCam.lookAt(eye, at);
-        
-        calcSpace();
+        getWindow()->setTitle("Preview mode");
     }
+    
+    mCtx->frame = 0;
+    mCtx->t = 0.f;
+    
+    if (mCtx->animate)
+    {
+        mCtx->frame = getElapsedFrames() - mStartFrame;
+        mCtx->t = getElapsedSeconds();
+        if (mMov->isCapturing())
+        {
+            mCtx->t = mCtx->frame / float(mMov->getFps());
+        }
+    }
+    
+    mScene->update();
 }
 
 void PlotSpaceApp::draw()
@@ -330,13 +231,12 @@ void PlotSpaceApp::renderScene()
     
     // Clear the buffer.
     gl::clear( ColorA(0.3, 0.3, 0.3, 1.0) );
-    //gl::color( Color::gray(0.3) );
     
     // Render our scene.
     gl::ScopedViewport scpViewport(0, 0, mFboScene->getWidth(), mFboScene->getHeight());
-    gl::setMatrices(mCam);
+    gl::setMatrices(mCtx->cam);
     
-    mSpace->draw();
+    mScene->draw();
     
     if (!mMov->isCapturing())
     {
@@ -344,7 +244,7 @@ void PlotSpaceApp::renderScene()
             gl::drawCoordinateFrame(1.);
         
         if (mShowParams)
-            mParams->draw();
+            mCtx->params->draw();
     }
 }
 
