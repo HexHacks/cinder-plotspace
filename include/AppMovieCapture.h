@@ -21,8 +21,8 @@ using AppMovieCaptureRef = std::shared_ptr<AppMovieCapture>;
 
 class AppMovieCapture
 {
-    using MovieWriter = ::jp::MovieWriter;
-    using MovieWriterRef = ::jp::MovieWriterRef;
+    using MovieWriter = ::jp::Muxer;
+    using MovieWriterRef = ::jp::MuxerRef;
     using App = ::ci::app::App;
     using path = ::ci::fs::path;
     

@@ -1,13 +1,13 @@
 //
-//  FMovieWriter.h
+//  Muxer.h
 //  PlotSpace
 //
 //  Created by Jacob Peyron on 13/11/17.
 //
 //
 
-#ifndef FMovieWriter_h
-#define FMovieWriter_h
+#ifndef Muxer_h
+#define Muxer_h
 
 #include <memory>
 #include <cstdint>
@@ -40,10 +40,10 @@ namespace jp
     struct OutputStream;
     using OutputStreamRef = std::shared_ptr<OutputStream>;
     
-    class MovieWriter;
-    using MovieWriterRef = std::shared_ptr<MovieWriter>;
+    class Muxer;
+    using MuxerRef = std::shared_ptr<Muxer>;
     
-    class MovieWriter
+    class Muxer
     {
     public:
         // Typedefs
@@ -69,13 +69,12 @@ namespace jp
         
         static void initialize();
         
-        //
-        MovieWriter();
-        ~MovieWriter();
+        Muxer();
+        ~Muxer();
         
         static Format getHighQualityFormat(AVCodecID codec, int fps = 30, int width = 512, int height = 512);
         
-        static MovieWriterRef create(const path& path, const Format& format);
+        static MuxerRef create(const path& path, const Format& format);
         
         //void addFrame(void* data, size_t bytes, AVPixelFormat pixelFormat);
         
@@ -112,4 +111,4 @@ namespace jp
     };
 }
 
-#endif /* FMovieWriter_h */
+#endif /* Muxer_h */

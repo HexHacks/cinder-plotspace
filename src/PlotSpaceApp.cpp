@@ -44,7 +44,7 @@ class PlotSpaceApp : public App {
     gl::FboRef mFboFinal;
     gl::TextureRef mFrameTex;
     
-    jp::MovieWriter::Format mMovFormat;
+    jp::Muxer::Format mMovFormat;
     
     SMAA mSMAA;
     
@@ -181,7 +181,7 @@ void PlotSpaceApp::setup()
     mPrevScene = mActiveScene = mScenes.size() - 1;
     mScenes[mActiveScene]->activate();
     
-    mMovFormat = jp::MovieWriter::getHighQualityFormat(AV_CODEC_ID_HEVC, 30, getWindowWidth(), getWindowHeight());
+    mMovFormat = jp::Muxer::getHighQualityFormat(AV_CODEC_ID_HEVC, 30, getWindowWidth(), getWindowHeight());
     
     mMov = AppMovieCapture::create(this);
 }

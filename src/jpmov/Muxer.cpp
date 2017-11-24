@@ -67,7 +67,7 @@ namespace jp
         struct SwrContext *swr_ctx;
     };
     
-    void MovieWriter::initialize()
+    void Muxer::initialize()
     {
         static bool initialized = false;
         if (!initialized)
@@ -80,7 +80,7 @@ namespace jp
         }
     }
     
-    MovieWriter::MovieWriter() :
+    Muxer::Muxer() :
         mFormat(),
         mPath(),
         mContext(nullptr),
@@ -89,19 +89,19 @@ namespace jp
         initialize();
     }
     
-    MovieWriter::~MovieWriter()
+    Muxer::~Muxer()
     {
         close();
     }
     
-    MovieWriterRef MovieWriter::create(const path& path, const Format& format)
+    MuxerRef Muxer::create(const path& path, const Format& format)
     {
-        auto ret = std::make_shared<MovieWriter>();
+        auto ret = std::make_shared<Muxer>();
         ret->open(path, format);
         return ret;
     }
     
-    MovieWriter::Format MovieWriter::getHighQualityFormat(AVCodecID codec, int fps, int width, int height)
+    Muxer::Format Muxer::getHighQualityFormat(AVCodecID codec, int fps, int width, int height)
     {
         Format out;
         out.videoCodec = codec;
@@ -136,7 +136,7 @@ namespace jp
                pkt->stream_index);
     }
     
-    void MovieWriter::writeFrame(OutputStreamRef stream)
+    void Muxer::writeFrame(OutputStreamRef stream)
     {
         //stream->pkt->duration = 1; // Always one positional increments
         
@@ -159,7 +159,7 @@ namespace jp
         av_packet_unref(stream->pkt);
     }
     
-    void MovieWriter::encodeFrame(OutputStreamRef stream)
+    void Muxer::encodeFrame(OutputStreamRef stream)
     {
         auto ret = avcodec_send_frame(stream->enc, stream->frame);
         throwOnCondition(ret < 0, "Error encoding video frame");
@@ -178,7 +178,7 @@ namespace jp
         }
     }
     
-    void MovieWriter::flushEncoder(OutputStreamRef stream)
+    void Muxer::flushEncoder(OutputStreamRef stream)
     {
         auto enc = mVideoStream->enc;
         
@@ -223,7 +223,7 @@ namespace jp
         }
     }
     
-    void MovieWriter::cpyToFrame(const cinder::Surface& surface)
+    void Muxer::cpyToFrame(const cinder::Surface& surface)
     {
         auto enc = mVideoStream->enc;
         auto dstFrame = mVideoStream->frame;
@@ -262,7 +262,7 @@ namespace jp
         dstFrame->pts = mVideoStream->next_pts++;
     }
     
-    void MovieWriter::addFrame(const cinder::Surface& surface)
+    void Muxer::addFrame(const cinder::Surface& surface)
     {
         assertOpen();
         
@@ -284,7 +284,7 @@ namespace jp
         av_packet_unref(ost->pkt);
     }
     
-    void MovieWriter::close()
+    void Muxer::close()
     {
         if (!mContext)
             return;
@@ -305,7 +305,7 @@ namespace jp
         mContext = nullptr;
     }
     
-    void MovieWriter::open(const path& path, const Format& format)
+    void Muxer::open(const path& path, const Format& format)
     {
         close();
         
@@ -329,7 +329,7 @@ namespace jp
         writeHeader();
     }
     
-    void MovieWriter::allocContext()
+    void Muxer::allocContext()
     {
         throwOnCondition(mContext != nullptr, "Internal error: Context in use.");
         
@@ -344,7 +344,7 @@ namespace jp
         THROW_ON_NULL(mContext, "Could not create context");
     }
     
-    void MovieWriter::allocStreamCommon(OutputStreamRef stream, AVCodecID codecId)
+    void Muxer::allocStreamCommon(OutputStreamRef stream, AVCodecID codecId)
     {
         // Find the encoder
         auto codec = avcodec_find_encoder(codecId);
@@ -434,7 +434,7 @@ namespace jp
             c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
     }
     
-    AVFrame* MovieWriter::allocFrame(enum AVPixelFormat pix_fmt, int width, int height)
+    AVFrame* Muxer::allocFrame(enum AVPixelFormat pix_fmt, int width, int height)
     {
         auto picture = av_frame_alloc();
         if (!picture)
@@ -452,7 +452,7 @@ namespace jp
         return picture;
     }
     
-    void MovieWriter::allocVideoStream()
+    void Muxer::allocVideoStream()
     {
         allocStreamCommon(mVideoStream, mFormat.videoCodec);
         
@@ -493,14 +493,14 @@ namespace jp
         mVideoStream->next_pts = 0;
     }
     
-    void MovieWriter::writeHeader()
+    void Muxer::writeHeader()
     {
         auto ret = avformat_write_header(mContext, nullptr);
         if (ret < 0)
             throw std::runtime_error("Internal error: could not write header.");
     }
 
-    void MovieWriter::assertOpen()
+    void Muxer::assertOpen()
     {
         if (!mContext)
             throw std::runtime_error("File not open");
