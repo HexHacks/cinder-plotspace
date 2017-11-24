@@ -56,6 +56,8 @@ namespace jp
         AVFrame* frame;
         AVFrame* tmp_frame;
         
+        AVRational frame_rate;
+        
         AVPacket* pkt;
         
         float t, tincr, tincr2;
@@ -110,8 +112,9 @@ namespace jp
         {
             case AV_CODEC_ID_H264:
             case AV_CODEC_ID_HEVC:
-                out.videoOptions["preset"] = "veryfast";
-                out.videoOptions["crf"] = "17";
+                out.videoOptions["tune"] = "grain";
+                out.videoOptions["preset"] = "slow";
+                out.videoOptions["crf"] = "21";
                 break;
                 
             default:
@@ -121,15 +124,38 @@ namespace jp
         return out;
     }
     
+    static void print_pkt(OutputStreamRef ost, AVRational* time_base)
+    {
+        auto pkt = ost->pkt;
+        
+        printf("pts:%s pts_time:%s dts:%s dts_time:%s duration:%s duration_time:%s stream_index:%d\n",
+               av_ts2str(pkt->pts), av_ts2timestr(pkt->pts, time_base),
+               av_ts2str(pkt->dts), av_ts2timestr(pkt->dts, time_base),
+               av_ts2str(pkt->duration), av_ts2timestr(pkt->duration, time_base),
+               pkt->stream_index);
+    }
+    
     void MovieWriter::writeFrame(OutputStreamRef stream)
     {
+        //stream->pkt->duration = 1; // Always one positional increments
+        
+        //printf("Encoder timebase: ");
+        //print_pkt(stream, &stream->enc->time_base);
+        
         // Rescale output packet timestamp values from codec to stream timebase
         av_packet_rescale_ts(stream->pkt, stream->enc->time_base, mVideoStream->st->time_base);
+        
         stream->pkt->stream_index = stream->st->index;
+        
+        //printf("Rescaled timebase: ");
+        //print_pkt(stream, &mVideoStream->st->time_base);
+        // printf("\n");
         
         // Write to disk
         auto ret = av_interleaved_write_frame(mContext, stream->pkt);
         throwOnCondition(ret < 0 , "Error writing frame");
+        
+        av_packet_unref(stream->pkt);
     }
     
     void MovieWriter::encodeFrame(OutputStreamRef stream)
@@ -148,8 +174,6 @@ namespace jp
                 throw std::runtime_error("Error while encoding");
             
             writeFrame(stream);
-            
-            av_packet_unref(pkt);
         }
     }
     
@@ -171,7 +195,6 @@ namespace jp
                 throw std::runtime_error("Error receiving packet while flushing encoder");
             
             writeFrame(stream);
-            av_packet_unref(pkt);
         }
     }
     
@@ -295,7 +318,7 @@ namespace jp
         allocContext();
         allocVideoStream();
         
-        //av_dump_format(mContext, 0, mPath.c_str(), 1);
+        av_dump_format(mContext, 0, mPath.c_str(), 1);
         
         // auto err = av_err2str(ret);
         auto ret = avio_open(&mContext->pb, mPath.c_str(), AVIO_FLAG_WRITE);
@@ -330,6 +353,7 @@ namespace jp
         THROW_ON_NULL(stream->st, "Could not allocate stream");
         
         stream->st->id = mContext->nb_streams-1;
+        stream->st->disposition = AV_DISPOSITION_DEFAULT;
         
         auto c = avcodec_alloc_context3(codec);
         THROW_ON_NULL(c, "Could not alloc an encoding context");
@@ -370,7 +394,7 @@ namespace jp
             case AVMEDIA_TYPE_VIDEO:
                 c->codec_id = codecId;
                 
-                c->bit_rate = 400000;
+                c->bit_rate = 1000000;
                 // Resolution must be a multiple of two.
                 c->width    = mFormat.width;
                 c->height   = mFormat.height;
@@ -379,8 +403,12 @@ namespace jp
                  * of which frame timestamps are represented. For fixed-fps content,
                  * timebase should be 1/framerate and timestamp increments should be
                  * identical to 1. */
-                stream->st->time_base = (AVRational){ 1, mFormat.framesPerSecond };
-                c->time_base = stream->st->time_base;
+                auto timeBase = (AVRational){ 1, mFormat.framesPerSecond };
+                stream->frame_rate = av_inv_q(timeBase);
+                
+                stream->st->time_base = timeBase;
+                stream->st->avg_frame_rate = stream->frame_rate;
+                c->time_base = timeBase;
                 
                 c->gop_size = 10; // emit one intra frame gop_size frames
                 c->max_b_frames = 1;
@@ -398,9 +426,6 @@ namespace jp
                     c->mb_decision = 2;
                 }
                 break;
-                
-            default:
-                break;
         }
         
         // Some formats want stream headers to be separate.
@@ -417,7 +442,7 @@ namespace jp
         picture->format = pix_fmt;
         picture->width  = width;
         picture->height = height;
-        picture->quality = mVideoStream->st->codec->global_quality;
+        picture->quality = mVideoStream->enc->global_quality;
 
         // Allocate the buffers for the frame data
         auto ret = av_frame_get_buffer(picture, 32);
