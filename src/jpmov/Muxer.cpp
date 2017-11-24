@@ -6,7 +6,8 @@
 //
 //
 
-#include "MovieWriter.h"
+#include "jpmov/Muxer.h"
+
 #include <cstring>
 #include <boost/format.hpp>
 

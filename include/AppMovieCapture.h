@@ -10,7 +10,7 @@
 #include <boost/filesystem.hpp>
 #include <exception>
 #include "cinder/app/App.h"
-#include "MovieWriter.h"
+#include "jpmov/Muxer.h"
 #include "JUtil.h"
 
 #ifndef AppMovieCapture_h
