@@ -14,16 +14,7 @@
 #include <map>
 #include <string>
 #include <boost/filesystem.hpp>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-    
-#include <libavcodec/avcodec.h>
-    
-#ifdef __cplusplus
-}
-#endif
+#include "Format.h"
 
 // Remove this if cinder is not available
 #define USE_CINDER
@@ -48,33 +39,13 @@ namespace jp
     public:
         // Typedefs
         using path = boost::filesystem::path;
-        using Options = std::map<std::string, std::string>;
-        
-        struct Format
-        {
-            AVCodecID videoCodec;
-            //AVCodecID audioCodec; // Not yet implemented
-            
-            int framesPerSecond;
-            int width, height;
-            Options videoOptions;
-            
-            Format() :
-                videoCodec(AV_CODEC_ID_HEVC),
-                framesPerSecond(30),
-                width(512),
-                height(523)
-            {}
-        };
         
         static void initialize();
         
         Muxer();
         ~Muxer();
         
-        static Format getHighQualityFormat(AVCodecID codec, int fps = 30, int width = 512, int height = 512);
-        
-        static MuxerRef create(const path& path, const Format& format);
+        static MuxerRef create(const path& path, const MuxFormat& format);
         
         //void addFrame(void* data, size_t bytes, AVPixelFormat pixelFormat);
         
@@ -82,12 +53,12 @@ namespace jp
         void addFrame(const cinder::Surface& surface);
 #endif
         
-        void open(const path& path, const Format& format);
+        void open(const path& path, const MuxFormat& format);
         void close();
         
     private:
         
-        Format mFormat;
+        MuxFormat mFormat;
         path mPath;
         
         AVFormatContext* mContext;

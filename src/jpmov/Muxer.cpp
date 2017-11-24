@@ -36,7 +36,6 @@ static void throwOnCondition(bool cond, const char* msg)
 
 #define THROW_ON_NULL(a, msg) throwOnCondition(a == nullptr, msg)
 
-#define STREAM_PIX_FMT AV_PIX_FMT_YUV420P
 #define TMP_PIX_FMT AV_PIX_FMT_RGB24
 #define TMP_R 0
 #define TMP_G 1
@@ -94,35 +93,11 @@ namespace jp
         close();
     }
     
-    MuxerRef Muxer::create(const path& path, const Format& format)
+    MuxerRef Muxer::create(const path& path, const MuxFormat& format)
     {
         auto ret = std::make_shared<Muxer>();
         ret->open(path, format);
         return ret;
-    }
-    
-    Muxer::Format Muxer::getHighQualityFormat(AVCodecID codec, int fps, int width, int height)
-    {
-        Format out;
-        out.videoCodec = codec;
-        out.framesPerSecond = fps;
-        out.width = width;
-        out.height = height;
-        
-        switch (codec)
-        {
-            case AV_CODEC_ID_H264:
-            case AV_CODEC_ID_HEVC:
-                out.videoOptions["tune"] = "grain";
-                out.videoOptions["preset"] = "slow";
-                out.videoOptions["crf"] = "21";
-                break;
-                
-            default:
-                break;
-        }
-        
-        return out;
     }
     
     static void print_pkt(OutputStreamRef ost, AVRational* time_base)
@@ -305,7 +280,7 @@ namespace jp
         mContext = nullptr;
     }
     
-    void Muxer::open(const path& path, const Format& format)
+    void Muxer::open(const path& path, const MuxFormat& format)
     {
         close();
         
@@ -413,7 +388,7 @@ namespace jp
                 
                 c->gop_size = 10; // emit one intra frame gop_size frames
                 c->max_b_frames = 1;
-                c->pix_fmt = STREAM_PIX_FMT;
+                c->pix_fmt = mFormat.videoPixFmt;
                 if (c->codec_id == AV_CODEC_ID_MPEG2VIDEO)
                 {
                     // Just for testing, we also add B-frames
@@ -452,6 +427,32 @@ namespace jp
         return picture;
     }
     
+    static AVDictionary* getDict(const Options& options)
+    {
+        AVDictionary* opt = nullptr;
+        for (const auto& kv : options)
+        {
+            av_dict_set(&opt, kv.first.c_str(), kv.second.c_str(), 0);
+        }
+        
+        return opt;
+    }
+    
+    static Options getOptions(AVDictionary* opt)
+    {
+        Options out;
+        
+        int cnt = av_dict_count(opt);
+        AVDictionaryEntry* entry = nullptr;
+        for (int i = 0; i < cnt; i++)
+        {
+            entry = av_dict_get(opt, "", entry, AV_DICT_IGNORE_SUFFIX);
+            out[entry->key] = entry->value;
+        }
+        
+        return out;
+    }
+    
     void Muxer::allocVideoStream()
     {
         allocStreamCommon(mVideoStream, mFormat.videoCodec);
@@ -459,14 +460,14 @@ namespace jp
         auto c = mVideoStream->enc;
         auto codec = c->codec;
         
-        AVDictionary* opt = nullptr;
-        for (const auto& kv : mFormat.videoOptions)
-        {
-            av_dict_set(&opt, kv.first.c_str(), kv.second.c_str(), 0);
-        }
+        auto opt = getDict(mFormat.videoOptions);
         
         auto ret = avcodec_open2(c, codec, &opt);
         throwOnCondition(ret < 0, "Could not open video codec");
+        
+        // Opt will be filled with bad options
+        auto badOptions = getOptions(opt);
+        throwOnCondition(badOptions.empty(), "Bad video codec options");
         
         // Allocate and init a re-usable frame
         mVideoStream->frame = allocFrame(c->pix_fmt, c->width, c->height);

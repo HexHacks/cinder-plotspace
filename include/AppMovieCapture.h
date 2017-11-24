@@ -26,7 +26,7 @@ class AppMovieCapture
     using App = ::ci::app::App;
     using path = ::ci::fs::path;
     
-    MovieWriter::Format mFormat;
+    jp::MuxFormat mFormat;
     MovieWriterRef mMov;
     path mPath;
     App* mApp;
@@ -120,7 +120,7 @@ public:
         start(mFormat);
     }
     
-    void start(const MovieWriter::Format& format)
+    void start(const jp::MuxFormat& format)
     {
         mFrame = 0;
         if (mRenewPath)
