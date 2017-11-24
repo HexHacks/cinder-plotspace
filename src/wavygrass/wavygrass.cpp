@@ -252,10 +252,13 @@ void jp::WavygrassImpl::setup()
 
 void jp::WavygrassImpl::update()
 {
-    auto t = mCtx->t;
-    auto f = 2.*PI*t*0.01;
-    auto r = 19.f;
-    mCtx->cam.lookAt(vec3(r*cos(f), 5.f, r*sin(f)), vec3(0., 3., 0.));
+    if (mCtx->animate)
+    {
+        auto t = mCtx->t;
+        auto f = 2.*PI*t*0.01;
+        auto r = 19.f;
+        mCtx->cam.lookAt(vec3(r*cos(f), 5.f - sin(f*10.), r*sin(f)), vec3(0., 3., 0.));
+    }
 }
 
 void jp::WavygrassImpl::draw()
@@ -269,11 +272,11 @@ void jp::WavygrassImpl::draw()
     
     //gl::drawCoordinateFrame();
     
-    float t = getElapsedSeconds();
+    float t = mCtx->t;
     createTree(t);
     
-    int w = 10;
-    int h = 10;
+    auto w = mScales[0].size();
+    auto h = mScales.size();
     for (int y = 0; y < h; y++)
     {
         for(int x = 0; x < w; x++)
