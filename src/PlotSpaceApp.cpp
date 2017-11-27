@@ -16,6 +16,7 @@
 #include "Context.h"
 #include "scene/Wavygrass.h"
 #include "scene/Pltspace.h"
+#include "scene/Treegen.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -156,7 +157,8 @@ void PlotSpaceApp::setup()
     
     mScenes = {
         jp::Pltspace::create(mCtx),
-        jp::Wavygrass::create(mCtx)
+        jp::Wavygrass::create(mCtx),
+        jp::Treegen::create(mCtx)
     };
     
     resetTime();
