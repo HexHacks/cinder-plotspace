@@ -11,34 +11,25 @@
 
 #include <string>
 #include <exception>
+#include <boost/format.hpp>
 #include <boost/filesystem.hpp>
+#include <cmath>
+#include "cinder/gl/GlslProg.h"
 
 namespace jp
 {
     using path = boost::filesystem::path;
     
-    path ensureTmpOutput(const path& dir, const std::string& ext)
+    template<typename T>
+    T sigmoid(T x)
     {
-        auto o = dir / (boost::format("out_0.%1%") % ext).str();
-        if (!boost::filesystem::exists(dir))
-        {
-            boost::filesystem::create_directory(dir);
-        }
-        else if (boost::filesystem::is_directory(dir))
-        {
-            int i = 0;
-            while (boost::filesystem::exists(o))
-            {
-                o = dir / (boost::format("out_%1%.%2%") % i++ % ext).str();
-            }
-        }
-        else
-        {
-            throw std::runtime_error("Bad input directory");
-        }
-        
-        return o;
+        float xp = exp(x);
+        return xp / (xp + 1.f);
     }
+    
+    path ensureTmpOutput(const path& dir, const std::string& ext);
+    
+    ci::gl::GlslProgRef loadShader(const path& dir, const std::string& name);
 }
 
 
