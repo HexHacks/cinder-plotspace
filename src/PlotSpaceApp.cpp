@@ -14,8 +14,8 @@
 #include <cmath>
 
 #include "Context.h"
-#include "wavygrass/Wavygrass.h"
-#include "pltspace/Pltspace.h"
+#include "scene/Wavygrass.h"
+#include "scene/Pltspace.h"
 
 using namespace ci;
 using namespace ci::app;

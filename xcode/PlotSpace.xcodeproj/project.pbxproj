@@ -16,11 +16,11 @@
 		00B784B60FF439BC000DE1D7 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B20FF439BC000DE1D7 /* CoreAudio.framework */; };
 		00B9955A1B128DF400A5C623 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B995581B128DF400A5C623 /* IOKit.framework */; };
 		00B9955B1B128DF400A5C623 /* IOSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B995591B128DF400A5C623 /* IOSurface.framework */; };
-		16209A5F1FC72BDC00A2C9D1 /* wavygrass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16209A5E1FC72BDB00A2C9D1 /* wavygrass.cpp */; };
-		16209A671FC7520800A2C9D1 /* Pltspace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16209A661FC7520800A2C9D1 /* Pltspace.cpp */; };
 		16209A6D1FC843C600A2C9D1 /* Muxer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16209A6C1FC843C600A2C9D1 /* Muxer.cpp */; };
 		16209A701FC8462100A2C9D1 /* Format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16209A6F1FC8462100A2C9D1 /* Format.cpp */; };
 		16209A721FC8F86800A2C9D1 /* JUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16209A711FC8F86800A2C9D1 /* JUtil.cpp */; };
+		16209A7A1FCBDD4500A2C9D1 /* Pltspace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16209A781FCBDD4500A2C9D1 /* Pltspace.cpp */; };
+		16209A7B1FCBDD4500A2C9D1 /* Wavygrass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16209A791FCBDD4500A2C9D1 /* Wavygrass.cpp */; };
 		16E0EBC11FB8806A0018285F /* SMAA.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E0EBBF1FB8806A0018285F /* SMAA.cpp */; };
 		16FA3B721FBC40D400815F08 /* libavcodec.57.107.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B6D1FBC3F7F00815F08 /* libavcodec.57.107.100.dylib */; };
 		16FA3B7B1FBC40D400815F08 /* libavdevice.57.10.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B731FBC40D400815F08 /* libavdevice.57.10.100.dylib */; };
@@ -48,17 +48,17 @@
 		00B995581B128DF400A5C623 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		00B995591B128DF400A5C623 /* IOSurface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOSurface.framework; path = System/Library/Frameworks/IOSurface.framework; sourceTree = SDKROOT; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		16209A5E1FC72BDB00A2C9D1 /* wavygrass.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = wavygrass.cpp; path = ../src/wavygrass/wavygrass.cpp; sourceTree = "<group>"; };
-		16209A611FC72C0900A2C9D1 /* Wavygrass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Wavygrass.h; path = ../include/wavygrass/Wavygrass.h; sourceTree = "<group>"; };
 		16209A621FC72C6E00A2C9D1 /* Context.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Context.h; path = ../include/Context.h; sourceTree = "<group>"; };
-		16209A641FC751B500A2C9D1 /* Pltspace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Pltspace.h; path = ../include/pltspace/Pltspace.h; sourceTree = "<group>"; };
-		16209A661FC7520800A2C9D1 /* Pltspace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Pltspace.cpp; path = ../src/pltspace/Pltspace.cpp; sourceTree = "<group>"; };
-		16209A681FC82DEE00A2C9D1 /* Scene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Scene.h; path = ../include/Scene.h; sourceTree = "<group>"; };
 		16209A6A1FC843A600A2C9D1 /* Muxer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Muxer.h; path = ../include/jpmov/Muxer.h; sourceTree = "<group>"; };
 		16209A6C1FC843C600A2C9D1 /* Muxer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Muxer.cpp; path = ../src/jpmov/Muxer.cpp; sourceTree = "<group>"; };
 		16209A6E1FC845FA00A2C9D1 /* Format.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Format.h; path = ../include/jpmov/Format.h; sourceTree = "<group>"; };
 		16209A6F1FC8462100A2C9D1 /* Format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Format.cpp; path = ../src/jpmov/Format.cpp; sourceTree = "<group>"; };
 		16209A711FC8F86800A2C9D1 /* JUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JUtil.cpp; path = ../src/JUtil.cpp; sourceTree = "<group>"; };
+		16209A741FCBDD3300A2C9D1 /* Pltspace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Pltspace.h; path = ../include/scene/Pltspace.h; sourceTree = "<group>"; };
+		16209A751FCBDD3300A2C9D1 /* Scene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Scene.h; path = ../include/scene/Scene.h; sourceTree = "<group>"; };
+		16209A761FCBDD3300A2C9D1 /* Wavygrass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Wavygrass.h; path = ../include/scene/Wavygrass.h; sourceTree = "<group>"; };
+		16209A781FCBDD4500A2C9D1 /* Pltspace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Pltspace.cpp; path = ../src/scene/Pltspace.cpp; sourceTree = "<group>"; };
+		16209A791FCBDD4500A2C9D1 /* Wavygrass.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Wavygrass.cpp; path = ../src/scene/Wavygrass.cpp; sourceTree = "<group>"; };
 		16E0EBB91FB5FEFE0018285F /* LineSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LineSpace.h; path = ../include/LineSpace.h; sourceTree = "<group>"; };
 		16E0EBBA1FB700060018285F /* AppMovieCapture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppMovieCapture.h; path = ../include/AppMovieCapture.h; sourceTree = "<group>"; };
 		16E0EBBD1FB8806A0018285F /* AreaTex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AreaTex.h; path = ../src/smaa/AreaTex.h; sourceTree = "<group>"; };
@@ -127,9 +127,8 @@
 		080E96DDFE201D6D7F000001 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				16209A771FCBDD3A00A2C9D1 /* scene */,
 				16209A6B1FC843AF00A2C9D1 /* jpmov */,
-				16209A651FC751F000A2C9D1 /* pltspace */,
-				16209A5D1FC72BC800A2C9D1 /* wavygrass */,
 				16E0EBC21FB8807B0018285F /* SMAA */,
 				380EF23AC70E4E3C94EBA7A0 /* PlotSpaceApp.cpp */,
 				16209A711FC8F86800A2C9D1 /* JUtil.cpp */,
@@ -164,38 +163,6 @@
 			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
-		16209A5D1FC72BC800A2C9D1 /* wavygrass */ = {
-			isa = PBXGroup;
-			children = (
-				16209A5E1FC72BDB00A2C9D1 /* wavygrass.cpp */,
-			);
-			name = wavygrass;
-			sourceTree = "<group>";
-		};
-		16209A601FC72BE200A2C9D1 /* wavygrass */ = {
-			isa = PBXGroup;
-			children = (
-				16209A611FC72C0900A2C9D1 /* Wavygrass.h */,
-			);
-			name = wavygrass;
-			sourceTree = "<group>";
-		};
-		16209A631FC7519B00A2C9D1 /* pltspace */ = {
-			isa = PBXGroup;
-			children = (
-				16209A641FC751B500A2C9D1 /* Pltspace.h */,
-			);
-			name = pltspace;
-			sourceTree = "<group>";
-		};
-		16209A651FC751F000A2C9D1 /* pltspace */ = {
-			isa = PBXGroup;
-			children = (
-				16209A661FC7520800A2C9D1 /* Pltspace.cpp */,
-			);
-			name = pltspace;
-			sourceTree = "<group>";
-		};
 		16209A691FC8439600A2C9D1 /* jpmov */ = {
 			isa = PBXGroup;
 			children = (
@@ -212,6 +179,25 @@
 				16209A6F1FC8462100A2C9D1 /* Format.cpp */,
 			);
 			name = jpmov;
+			sourceTree = "<group>";
+		};
+		16209A731FCBDD2500A2C9D1 /* scene */ = {
+			isa = PBXGroup;
+			children = (
+				16209A741FCBDD3300A2C9D1 /* Pltspace.h */,
+				16209A751FCBDD3300A2C9D1 /* Scene.h */,
+				16209A761FCBDD3300A2C9D1 /* Wavygrass.h */,
+			);
+			name = scene;
+			sourceTree = "<group>";
+		};
+		16209A771FCBDD3A00A2C9D1 /* scene */ = {
+			isa = PBXGroup;
+			children = (
+				16209A781FCBDD4500A2C9D1 /* Pltspace.cpp */,
+				16209A791FCBDD4500A2C9D1 /* Wavygrass.cpp */,
+			);
+			name = scene;
 			sourceTree = "<group>";
 		};
 		16E0EBC21FB8807B0018285F /* SMAA */ = {
@@ -249,16 +235,14 @@
 		29B97315FDCFA39411CA2CEA /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				16209A731FCBDD2500A2C9D1 /* scene */,
 				16209A691FC8439600A2C9D1 /* jpmov */,
-				16209A631FC7519B00A2C9D1 /* pltspace */,
-				16209A601FC72BE200A2C9D1 /* wavygrass */,
 				16E0EBB91FB5FEFE0018285F /* LineSpace.h */,
 				2E720DBFF4264E9CAEF1D2E2 /* Resources.h */,
 				9B73EBAA23A94822A8FD4F98 /* PlotSpace_Prefix.pch */,
 				16E0EBBA1FB700060018285F /* AppMovieCapture.h */,
 				16FA3B831FBF572000815F08 /* JUtil.h */,
 				16209A621FC72C6E00A2C9D1 /* Context.h */,
-				16209A681FC82DEE00A2C9D1 /* Scene.h */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
@@ -355,9 +339,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				16209A6D1FC843C600A2C9D1 /* Muxer.cpp in Sources */,
-				16209A671FC7520800A2C9D1 /* Pltspace.cpp in Sources */,
+				16209A7B1FCBDD4500A2C9D1 /* Wavygrass.cpp in Sources */,
+				16209A7A1FCBDD4500A2C9D1 /* Pltspace.cpp in Sources */,
 				16209A701FC8462100A2C9D1 /* Format.cpp in Sources */,
-				16209A5F1FC72BDC00A2C9D1 /* wavygrass.cpp in Sources */,
 				16209A721FC8F86800A2C9D1 /* JUtil.cpp in Sources */,
 				7399E654AA414726AA237B08 /* PlotSpaceApp.cpp in Sources */,
 				16E0EBC11FB8806A0018285F /* SMAA.cpp in Sources */,

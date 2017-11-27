@@ -6,7 +6,7 @@
 //
 //
 
-#include "pltspace/Pltspace.h"
+#include "scene/Pltspace.h"
 #include "LineSpace.h"
 #include "JUtil.h"
 
