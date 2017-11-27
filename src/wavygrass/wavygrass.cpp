@@ -4,6 +4,9 @@
 #include "cinder/TriMesh.h"
 #include "cinder/CameraUi.h"
 #include "cinder/Rand.h"
+#include "cinder/Perlin.h"
+
+#include "JUtil.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -147,16 +150,27 @@ public:
 
 namespace jp
 {
+    
+// Vatten
+// Blurrito
+//
 class WavygrassImpl
 {
+    struct Prop
+    {
+        float scale;
+        float a, b;
+    };
+    using Row = std::vector<Prop>;
+    
     ContextRef mCtx;
     
-    TriMeshRef mTriMesh;
     TreeMesh mTree;
+    gl::GlslProgRef mWavyGlsl;
+
+    std::vector<Row> mScales;
     
-    std::vector<std::vector<float>> mScales;
-    
-    void createTree(float t);
+    gl::VboMeshRef createTree(float t, Prop& prop);
     
   public:
     WavygrassImpl(ContextRef ctx) :
@@ -166,6 +180,8 @@ class WavygrassImpl
 	void setup();
 	void update();
 	void draw();
+    
+    void recreate();
 };
     
     Wavygrass::Wavygrass(ContextRef ctx) :
@@ -186,6 +202,7 @@ class WavygrassImpl
     
     void Wavygrass::activate()
     {
+        mCtx->muxFormat.videoOptions["tune"] = "film";
     }
     
     void Wavygrass::deactivate()
@@ -204,9 +221,9 @@ class WavygrassImpl
     
 }
 
-void jp::WavygrassImpl::createTree(float t)
+gl::VboMeshRef jp::WavygrassImpl::createTree(float t, Prop& prop)
 {
-    mTriMesh = TriMesh::create(TriMesh::Format().positions().normals());
+    auto mesh = TriMesh::create(TriMesh::Format().positions().normals().texCoords0());
     
     std::vector<vec3> pts;
     int cnt = 30;
@@ -216,8 +233,8 @@ void jp::WavygrassImpl::createTree(float t)
         
         auto at = PI*sin(t);
         auto bt = PI*cos(t);
-        auto a = 2.f*PI*f;
-        auto r = f*f*f*f;
+        auto a = 2.f*PI*f*prop.a;
+        auto r = f*f*f*f*(1.-prop.a);
         pts.push_back(vec3(r*cos(a+at), f*5., r*sin(a+bt)));
     }
     
@@ -229,35 +246,61 @@ void jp::WavygrassImpl::createTree(float t)
     
     BSpline3f ptSpl(pts, 3, false, true);
     
-    mTree.buildMesh(mTriMesh.get(), ptSpl, 40, localT);
+    mTree.buildMesh(mesh.get(), ptSpl, 40, localT);
+    return gl::VboMesh::create(*mesh);
+}
+
+void jp::WavygrassImpl::recreate()
+{
+    Rand rnd(100);
+    const auto octaves = 5;
+    const auto seed = 1000;
+    Perlin perl(octaves, seed);
+    
+    auto t = mCtx->t;
+    
+    int w = 10;
+    int h = 10;
+    mScales.clear();
+    for (int y = 0; y < h; y++)
+    {
+        Row row;
+        
+        for(int x = 0; x < w; x++)
+        {
+            Prop p;
+            p.scale = rnd.nextFloat(0.7, 1.);
+            vec3 dfBm = perl.dfBm(vec3(0., t, 0.));
+            p.a = dfBm.x * 0.5 * sin(t+x);
+            p.b = dfBm.y * 0.5 * sin(t+0.4+y) + sigmoid(y*t*t*t*t*t);
+            row.push_back(p);
+        }
+        
+        mScales.push_back(row);
+    }
 }
 
 void jp::WavygrassImpl::setup()
 {
-    Rand rnd(100);
-    
-    int w = 10;
-    int h = 10;
-    for (int y = 0; y < h; y++)
-    {
-        mScales.push_back(std::vector<float>());
-        for(int x = 0; x < w; x++)
-        {
-            mScales[y].push_back(rnd.nextFloat(0.7, 1.));
-        }
-    }
-    
-    createTree(0.f);
+    mWavyGlsl = loadShader(getAssetPath("wavygrass"), "grass");
+    recreate();
 }
 
 void jp::WavygrassImpl::update()
 {
+    auto t = mCtx->t;
+    
+    recreate();
+    
+    mWavyGlsl->uniform("uTime", t);
+    
     if (mCtx->animate)
     {
-        auto t = mCtx->t;
         auto f = 2.*PI*t*0.01;
-        auto r = 19.f;
-        mCtx->cam.lookAt(vec3(r*cos(f), 5.f - sin(f*10.), r*sin(f)), vec3(0., 3., 0.));
+        //auto r = 20.f;
+        auto r = 5.f;
+        //mCtx->cam.lookAt(vec3(r*cos(f), 5.f - sin(f*10.), r*sin(f)), vec3(0., 3., 0.));
+        mCtx->cam.lookAt(vec3(0., 3.9, 0.), vec3(r*cos(f), 4.f, r*sin(f)));
     }
 }
 
@@ -265,15 +308,20 @@ void jp::WavygrassImpl::draw()
 {
     gl::ScopedColor scpCol;
     gl::ScopedBlend scpBlnd(GL_SRC_ALPHA, GL_ONE);
+    gl::ScopedDepth scpDpth(true); // R/W
+    //gl::ScopedPolygonMode scpMode(GL_LINE);
     
-    gl::setMatrices(mCtx->cam);
+    gl::clearColor(Color(0.3, 0.3, 0.3));
+    gl::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     //gl::enableDepth();
     //gl::enableFaceCulling();
     
     //gl::drawCoordinateFrame();
     
+    mWavyGlsl->bind();
+    
     float t = mCtx->t;
-    createTree(t);
     
     auto w = mScales[0].size();
     auto h = mScales.size();
@@ -286,13 +334,16 @@ void jp::WavygrassImpl::draw()
             auto at = vec3(x-(w-1)/2.f, 0, y-(h-1)/2.f) * 3.f;
             gl::translate(at);
             
-            auto scl = mScales[y][x];
-            gl::scale(vec3(1., scl, 1.));
+            auto prop = mScales[y][x];
+            gl::scale(vec3(1., prop.scale, 1.));
             
             auto xx = 0.5*x / float(w);
             auto yy = 0.5*y / float(h);
-            gl::color(ColorA(Colorf(ColorModel::CM_HSV, xx+yy, 0.7, 0.7), 0.25f));
-            gl::draw(*mTriMesh);
+            auto color = ColorA(Colorf(ColorModel::CM_HSV, math<float>::clamp(xx+yy, 0., 1.), 0.7, 0.9), 0.30f);
+            
+            mWavyGlsl->uniform("uColor", color);
+            auto tree = createTree(t, prop);
+            gl::draw(tree);
         }
     }
 }
