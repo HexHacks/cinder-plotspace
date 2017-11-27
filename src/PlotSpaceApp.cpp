@@ -44,8 +44,6 @@ class PlotSpaceApp : public App {
     gl::FboRef mFboFinal;
     gl::TextureRef mFrameTex;
     
-    jp::MuxFormat mMovFormat;
-    
     SMAA mSMAA;
     
   public:
@@ -76,10 +74,10 @@ class PlotSpaceApp : public App {
         mFboFinal = gl::Fbo::create( getWindowWidth(), getWindowHeight(), fmt );
         
         mCtx->screenSize.x =
-        mMovFormat.width = getWindowWidth();
+        mCtx->muxFormat.width = getWindowWidth();
         
         mCtx->screenSize.y =
-        mMovFormat.height = getWindowHeight();
+        mCtx->muxFormat.height = getWindowHeight();
         
         mCtx->cam.setAspectRatio(getWindowAspectRatio());
     }
@@ -97,7 +95,7 @@ class PlotSpaceApp : public App {
         mCtx->animate = true;
         
         mMov->setAutoFinish(mRecFrames);
-        mMov->start(mMovFormat);
+        mMov->start(mCtx->muxFormat);
     }
     
     void setupParams()
@@ -179,14 +177,15 @@ void PlotSpaceApp::setup()
         s->setup();
     
     mPrevScene = mActiveScene = mScenes.size() - 1;
-    mScenes[mActiveScene]->activate();
     
-    setHighQualityFormat(mMovFormat, AV_CODEC_ID_HEVC);
-    mMovFormat.width = getWindowWidth();
-    mMovFormat.height = getWindowHeight();
-    mMovFormat.framesPerSecond = 30;
+    setHighQualityFormat(mCtx->muxFormat, AV_CODEC_ID_HEVC);
+    mCtx->muxFormat.width = getWindowWidth();
+    mCtx->muxFormat.height = getWindowHeight();
+    mCtx->muxFormat.framesPerSecond = 30;
     
     mMov = AppMovieCapture::create(this);
+    
+    mScenes[mActiveScene]->activate();
 }
 
 void PlotSpaceApp::mouseDown( MouseEvent event )
@@ -206,7 +205,7 @@ void PlotSpaceApp::update()
     }
     
     mCtx->frame = 0;
-    mCtx->t = 0.f;
+    mCtx->t = getElapsedSeconds();
     
     if (mCtx->animate)
     {
@@ -257,9 +256,6 @@ void PlotSpaceApp::draw()
 void PlotSpaceApp::renderScene()
 {
     gl::ScopedFramebuffer scpFbo( mFboScene );
-    
-    // Clear the buffer.
-    gl::clear( ColorA(0.3, 0.3, 0.3, 1.0) );
     
     // Render our scene.
     gl::ScopedViewport scpViewport(0, 0, mFboScene->getWidth(), mFboScene->getHeight());

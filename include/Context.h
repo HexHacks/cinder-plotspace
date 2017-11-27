@@ -13,6 +13,8 @@
 #include "cinder/CameraUi.h"
 #include "cinder/params/Params.h"
 
+#include "jpmov/Format.h"
+
 namespace jp
 {
     struct Context;
@@ -28,6 +30,8 @@ namespace jp
         float t;
         int frame;
         cinder::ivec2 screenSize;
+        
+        jp::MuxFormat muxFormat;
     };
 }
 
