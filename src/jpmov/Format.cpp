@@ -13,27 +13,44 @@ jp::MuxFormat::MuxFormat() :
     videoPixFmt(AV_PIX_FMT_YUV444P),
     framesPerSecond(30),
     width(512),
-    height(523)
+    height(523),
+    bitRate(24960000)
 {}
 
-void jp::setHighQualityFormat(MuxFormat& out, AVCodecID codec)
+void jp::MuxFormat::setHighQualityVideoOptions(AVCodecID codec)
 {
-    out.videoCodec = codec;
+    videoCodec = codec;
     
     // Default stream format
-    out.videoPixFmt = AV_PIX_FMT_YUV420P;
+    videoPixFmt = AV_PIX_FMT_YUV420P;
     
-    out.videoOptions.clear();
+    videoOptions.clear();
     switch (codec)
     {
         case AV_CODEC_ID_H264:
+            // qmin 50 an qmax 51 gives the lowest quality
+            // qmin 0 -qmax 1 gives the highest quality
+            
+            // 16 - 26 (120mb)
+            // 24 - 30 (30Mbish)
+            
+            videoOptions["profile"] = "high";
         case AV_CODEC_ID_HEVC:
-            out.videoOptions["preset"] = "medium";
-            out.videoOptions["crt"] = "20";
-            out.videoOptions["tune"] = "grain";
+            videoOptions["tune"] = "film";
+            videoOptions["preset"] = "veryslow";
+            videoOptions["qmin"] = "22";
+            videoOptions["qmax"] = "28";
+            //videoOptions["crt"] = "20";
+            //videoOptions["tune"] = "grain";
             break;
             
         default:
             break;
     }
+}
+
+void jp::MuxFormat::setBitrateMB(int frameCount, int fileSizeMB)
+{
+    int duration = frameCount / framesPerSecond;
+    bitRate = (fileSizeMB * 8192/*to_kBit*/) / duration;
 }

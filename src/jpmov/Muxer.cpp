@@ -370,10 +370,13 @@ namespace jp
             case AVMEDIA_TYPE_VIDEO:
                 c->codec_id = codecId;
                 
-                c->bit_rate = 1000000;
+                c->bit_rate = mFormat.bitRate;
                 // Resolution must be a multiple of two.
                 c->width    = mFormat.width;
                 c->height   = mFormat.height;
+                
+                c->compression_level = 0;
+                c->global_quality = 10;
                 
                 /* timebase: This is the fundamental unit of time (in seconds) in terms
                  * of which frame timestamps are represented. For fixed-fps content,
@@ -467,7 +470,7 @@ namespace jp
         
         // Opt will be filled with bad options
         auto badOptions = getOptions(opt);
-        throwOnCondition(badOptions.empty(), "Bad video codec options");
+        throwOnCondition(!badOptions.empty(), "Bad video codec options");
         
         // Allocate and init a re-usable frame
         mVideoStream->frame = allocFrame(c->pix_fmt, c->width, c->height);

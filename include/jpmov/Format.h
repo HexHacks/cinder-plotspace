@@ -29,6 +29,8 @@ namespace jp
     struct MuxFormat
     {
         MuxFormat();
+        void setHighQualityVideoOptions(AVCodecID codec);
+        void setBitrateMB(int frameCount, int fileSizeMB);
         
         AVCodecID videoCodec;
         AVPixelFormat videoPixFmt;
@@ -36,10 +38,9 @@ namespace jp
         
         int framesPerSecond;
         int width, height;
+        int bitRate;
         Options videoOptions;
     };
-    
-    void setHighQualityFormat(MuxFormat& out, AVCodecID codec);
 }
 
 #endif /* Format_h */
