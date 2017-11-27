@@ -55,6 +55,9 @@ namespace jp
     }
     void Pltspace::activate()
     {
+        gl::enable( GL_LINE_SMOOTH );
+        glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+        
         mCtx->muxFormat.videoOptions["tune"] = "grain";
     }
     void Pltspace::deactivate()
@@ -208,6 +211,10 @@ namespace jp
     
     void PltspaceImpl::draw()
     {
+        gl::ScopedDepth scpDpth(true); // R/W
+        gl::clearColor(Color(0.3, 0.3, 0.3));
+        gl::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
         mSpace->draw();
     }
 }

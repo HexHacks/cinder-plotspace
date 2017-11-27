@@ -144,12 +144,7 @@ class PlotSpaceApp : public App {
 
 void PlotSpaceApp::setup()
 {
-    gl::enable( GL_LINE_SMOOTH );
-    glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
-    gl::enableDepthRead();
-    gl::enableDepthWrite();
     gl::enableVerticalSync();
-    //gl::disableAlphaBlending();
     
     setWindowSize(742, 742);
     
@@ -178,10 +173,11 @@ void PlotSpaceApp::setup()
     
     mPrevScene = mActiveScene = mScenes.size() - 1;
     
-    setHighQualityFormat(mCtx->muxFormat, AV_CODEC_ID_HEVC);
     mCtx->muxFormat.width = getWindowWidth();
     mCtx->muxFormat.height = getWindowHeight();
     mCtx->muxFormat.framesPerSecond = 30;
+    mCtx->muxFormat.setHighQualityVideoOptions(AV_CODEC_ID_HEVC);
+    mCtx->muxFormat.setBitrateMB(mRecFrames, 100);
     
     mMov = AppMovieCapture::create(this);
     
