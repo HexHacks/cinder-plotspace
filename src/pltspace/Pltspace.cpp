@@ -8,6 +8,7 @@
 
 #include "pltspace/Pltspace.h"
 #include "LineSpace.h"
+#include "JUtil.h"
 
 using namespace ci;
 using namespace glm;
@@ -54,7 +55,7 @@ namespace jp
     }
     void Pltspace::activate()
     {
-        
+        mCtx->muxFormat.videoOptions["tune"] = "grain";
     }
     void Pltspace::deactivate()
     {
@@ -114,12 +115,6 @@ namespace jp
     {
         auto s = sn(x);
         return s*s;
-    }
-    
-    inline float sigmoid(float x)
-    {
-        float xp = exp(x);
-        return xp / (xp + 1.f);
     }
     
     inline static vec4 col(float t, const ivec3& idx, const vec3& pos, const vec3& npos)
