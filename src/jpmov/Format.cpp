@@ -22,7 +22,7 @@ void jp::MuxFormat::setHighQualityVideoOptions(AVCodecID codec)
     videoCodec = codec;
     
     // Default stream format
-    videoPixFmt = AV_PIX_FMT_YUV420P;
+    videoPixFmt = AV_PIX_FMT_YUV444P;
     
     videoOptions.clear();
     switch (codec)
@@ -32,15 +32,20 @@ void jp::MuxFormat::setHighQualityVideoOptions(AVCodecID codec)
             // qmin 0 -qmax 1 gives the highest quality
             
             // 16 - 26 (120mb)
+            // 22 - 28 (110mb) Pltsspc 430frames
             // 24 - 30 (30Mbish)
             
-            videoOptions["profile"] = "high";
-        case AV_CODEC_ID_HEVC:
-            videoOptions["tune"] = "film";
+            videoOptions["profile"] = "high444";
             videoOptions["preset"] = "veryslow";
-            videoOptions["qmin"] = "22";
-            videoOptions["qmax"] = "28";
-            //videoOptions["crt"] = "20";
+            videoOptions["crf"] = "18";
+            //videoOptions["qmin"] = "24";
+            //videoOptions["qmax"] = "30";
+            break;
+        case AV_CODEC_ID_HEVC:
+            videoOptions["preset"] = "slow";
+            videoOptions["crf"] = "22";
+            videoOptions["qmin"] = "23";
+            videoOptions["qmax"] = "29";
             //videoOptions["tune"] = "grain";
             break;
             
