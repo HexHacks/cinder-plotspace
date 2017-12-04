@@ -34,8 +34,7 @@ class PlotSpaceApp : public App {
     
     AppMovieCaptureRef mMov;
     
-    bool mShowParams;
-    bool mShowFrame;
+    bool mShowDebug;
     bool mUseSmaa;
     unsigned int mRecFrames;
     
@@ -79,6 +78,8 @@ class PlotSpaceApp : public App {
         
         mCtx->screenSize.y =
         mCtx->muxFormat.height = getWindowHeight();
+        
+        printf("New screen size: %d x %d\n", getWindowWidth(), getWindowHeight());
         
         mCtx->cam.setAspectRatio(getWindowAspectRatio());
     }
@@ -136,8 +137,7 @@ class PlotSpaceApp : public App {
         mCtx->params->addParam("Rec frames", &mRecFrames).updateFn(timeReset);
         mCtx->params->addButton("Record", [this](){ startRec(); }, "key=r");
         mCtx->params->addSeparator();
-        mCtx->params->addParam("S/H Frame", &mShowFrame).key("f");
-        mCtx->params->addParam("S/H Params", &mShowParams).key("p");
+        mCtx->params->addParam("S/H Debug", &mShowDebug).key("d");
         mCtx->params->addSeparator();
     }
     
@@ -147,7 +147,7 @@ void PlotSpaceApp::setup()
 {
     gl::enableVerticalSync();
     
-    setWindowSize(742, 742);
+    setWindowSize(1280, 720);
     
     mCtx = std::make_shared<jp::Context>();
     mCtx->animate = false;
@@ -164,10 +164,9 @@ void PlotSpaceApp::setup()
     resetTime();
     setupParams();
     
-    mShowFrame = true;
-    mShowParams = true;
+    mShowDebug = true;
     mUseSmaa = false;
-    mRecFrames = 430;
+    mRecFrames = 500;
     
     // Setup scenes after params
     for (auto s : mScenes)
@@ -178,8 +177,8 @@ void PlotSpaceApp::setup()
     mCtx->muxFormat.width = getWindowWidth();
     mCtx->muxFormat.height = getWindowHeight();
     mCtx->muxFormat.framesPerSecond = 30;
-    mCtx->muxFormat.setHighQualityVideoOptions(AV_CODEC_ID_HEVC);
-    mCtx->muxFormat.setBitrateMB(mRecFrames, 100);
+    mCtx->muxFormat.setHighQualityVideoOptions(AV_CODEC_ID_H264);
+    mCtx->muxFormat.bitRate = 5000000;
     
     mMov = AppMovieCapture::create(this);
     
@@ -261,13 +260,11 @@ void PlotSpaceApp::renderScene()
     
     mScenes[mActiveScene]->draw();
     
-    if (!mMov->isCapturing())
+    if (!mMov->isCapturing() && mShowDebug)
     {
-        if (mShowFrame)
-            gl::drawCoordinateFrame(1.);
+        gl::drawCoordinateFrame(1.);
         
-        if (mShowParams)
-            mCtx->params->draw();
+        mCtx->params->draw();
     }
 }
 

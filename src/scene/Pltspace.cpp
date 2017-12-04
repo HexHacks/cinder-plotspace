@@ -211,6 +211,7 @@ namespace jp
     
     void PltspaceImpl::draw()
     {
+        gl::ScopedColor scpCol;
         gl::ScopedDepth scpDpth(true); // R/W
         gl::clearColor(Color(0.3, 0.3, 0.3));
         gl::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
