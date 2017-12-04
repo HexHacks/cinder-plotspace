@@ -14,5 +14,8 @@ void main( void )
     vec3 col = uColor.xyz;
     //col *= uv.x;
 
-    outColor = vec4(col, uColor.w);
+    float a = sin(uv.x * uv.y) * 0.25 + 0.5;
+    col *= a;
+
+    outColor = vec4(col, 0.5);
 }

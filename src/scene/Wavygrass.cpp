@@ -313,13 +313,12 @@ void jp::WavygrassImpl::draw()
     
     gl::clearColor(Color(0.3, 0.3, 0.3));
     gl::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    gl::ScopedGlslProg scpShader(mWavyGlsl);
 
     //gl::enableDepth();
     //gl::enableFaceCulling();
     
     //gl::drawCoordinateFrame();
-    
-    mWavyGlsl->bind();
     
     float t = mCtx->t;
     
