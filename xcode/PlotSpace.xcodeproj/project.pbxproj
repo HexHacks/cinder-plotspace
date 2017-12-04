@@ -23,6 +23,7 @@
 		16209A7B1FCBDD4500A2C9D1 /* Wavygrass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16209A791FCBDD4500A2C9D1 /* Wavygrass.cpp */; };
 		16209A811FCBE71D00A2C9D1 /* Treegen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16209A801FCBE71D00A2C9D1 /* Treegen.cpp */; };
 		1639AB851FD53BB4003324A2 /* Tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1639AB841FD53BB4003324A2 /* Tree.cpp */; };
+		1639AB8A1FD54177003324A2 /* Work2dee.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1639AB891FD54177003324A2 /* Work2dee.cpp */; };
 		16E0EBC11FB8806A0018285F /* SMAA.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E0EBBF1FB8806A0018285F /* SMAA.cpp */; };
 		16FA3B721FBC40D400815F08 /* libavcodec.57.107.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B6D1FBC3F7F00815F08 /* libavcodec.57.107.100.dylib */; };
 		16FA3B7B1FBC40D400815F08 /* libavdevice.57.10.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B731FBC40D400815F08 /* libavdevice.57.10.100.dylib */; };
@@ -65,6 +66,8 @@
 		16209A801FCBE71D00A2C9D1 /* Treegen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Treegen.cpp; path = ../src/scene/Treegen.cpp; sourceTree = "<group>"; };
 		1639AB841FD53BB4003324A2 /* Tree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Tree.cpp; path = ../src/data/Tree.cpp; sourceTree = "<group>"; };
 		1639AB861FD53C0C003324A2 /* Tree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tree.h; path = ../include/data/Tree.h; sourceTree = "<group>"; };
+		1639AB881FD54167003324A2 /* Work2dee.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Work2dee.h; path = ../include/scene/Work2dee.h; sourceTree = "<group>"; };
+		1639AB891FD54177003324A2 /* Work2dee.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Work2dee.cpp; path = ../src/scene/Work2dee.cpp; sourceTree = "<group>"; };
 		16E0EBB91FB5FEFE0018285F /* LineSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LineSpace.h; path = ../include/LineSpace.h; sourceTree = "<group>"; };
 		16E0EBBA1FB700060018285F /* AppMovieCapture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppMovieCapture.h; path = ../include/AppMovieCapture.h; sourceTree = "<group>"; };
 		16E0EBBD1FB8806A0018285F /* AreaTex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AreaTex.h; path = ../src/smaa/AreaTex.h; sourceTree = "<group>"; };
@@ -133,12 +136,12 @@
 		080E96DDFE201D6D7F000001 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				380EF23AC70E4E3C94EBA7A0 /* PlotSpaceApp.cpp */,
+				16209A711FC8F86800A2C9D1 /* JUtil.cpp */,
 				1639AB831FD53B75003324A2 /* data */,
 				16209A771FCBDD3A00A2C9D1 /* scene */,
 				16209A6B1FC843AF00A2C9D1 /* jpmov */,
 				16E0EBC21FB8807B0018285F /* SMAA */,
-				380EF23AC70E4E3C94EBA7A0 /* PlotSpaceApp.cpp */,
-				16209A711FC8F86800A2C9D1 /* JUtil.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -191,6 +194,7 @@
 		16209A731FCBDD2500A2C9D1 /* scene */ = {
 			isa = PBXGroup;
 			children = (
+				1639AB881FD54167003324A2 /* Work2dee.h */,
 				16209A7F1FCBE6F200A2C9D1 /* Treegen.h */,
 				16209A741FCBDD3300A2C9D1 /* Pltspace.h */,
 				16209A751FCBDD3300A2C9D1 /* Scene.h */,
@@ -202,6 +206,7 @@
 		16209A771FCBDD3A00A2C9D1 /* scene */ = {
 			isa = PBXGroup;
 			children = (
+				1639AB891FD54177003324A2 /* Work2dee.cpp */,
 				16209A801FCBE71D00A2C9D1 /* Treegen.cpp */,
 				16209A781FCBDD4500A2C9D1 /* Pltspace.cpp */,
 				16209A791FCBDD4500A2C9D1 /* Wavygrass.cpp */,
@@ -368,6 +373,7 @@
 				16209A6D1FC843C600A2C9D1 /* Muxer.cpp in Sources */,
 				16209A7B1FCBDD4500A2C9D1 /* Wavygrass.cpp in Sources */,
 				16209A7A1FCBDD4500A2C9D1 /* Pltspace.cpp in Sources */,
+				1639AB8A1FD54177003324A2 /* Work2dee.cpp in Sources */,
 				16209A701FC8462100A2C9D1 /* Format.cpp in Sources */,
 				16209A721FC8F86800A2C9D1 /* JUtil.cpp in Sources */,
 				7399E654AA414726AA237B08 /* PlotSpaceApp.cpp in Sources */,
