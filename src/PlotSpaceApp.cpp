@@ -10,6 +10,7 @@
 #include "AppMovieCapture.h"
 
 #include "smaa/SMAA.h"
+#include "fxaa/FXAA.h"
 
 #include <cmath>
 
@@ -46,6 +47,7 @@ class PlotSpaceApp : public App {
     gl::TextureRef mFrameTex;
     
     SMAA mSMAA;
+    FXAA mFXAA;
     
   public:
     
@@ -147,6 +149,7 @@ class PlotSpaceApp : public App {
 void PlotSpaceApp::setup()
 {
     gl::enableVerticalSync();
+    gl::disableBlending();
     
     setWindowSize(1280, 720);
     
@@ -223,6 +226,7 @@ void PlotSpaceApp::draw()
 {
     renderScene();
     
+    // Clear main buffer
     gl::clear();
     gl::color( Color::white() );
     
@@ -230,12 +234,14 @@ void PlotSpaceApp::draw()
     if (mUseSmaa)
     {
         mSMAA.apply( mFboFinal, mFboScene );
+        //mFXAA.apply(mFboFinal, mFboScene);
         fbo = mFboFinal;
     }
     else
         fbo = mFboScene;
     
     mFrameTex = fbo->getColorTexture();
+    //mFrameTex = mUseSmaa ? mSMAA.getEdgePass() : fbo->getColorTexture();
     
     {
         gl::ScopedMatrices scpMat;

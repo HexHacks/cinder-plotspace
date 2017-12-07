@@ -25,6 +25,7 @@
 		1639AB851FD53BB4003324A2 /* Tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1639AB841FD53BB4003324A2 /* Tree.cpp */; };
 		1639AB8A1FD54177003324A2 /* Work2dee.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1639AB891FD54177003324A2 /* Work2dee.cpp */; };
 		16E0EBC11FB8806A0018285F /* SMAA.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E0EBBF1FB8806A0018285F /* SMAA.cpp */; };
+		16E7BFB71FD94DAD0027B037 /* FXAA.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E7BFB61FD94DAD0027B037 /* FXAA.cpp */; };
 		16FA3B721FBC40D400815F08 /* libavcodec.57.107.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B6D1FBC3F7F00815F08 /* libavcodec.57.107.100.dylib */; };
 		16FA3B7B1FBC40D400815F08 /* libavdevice.57.10.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B731FBC40D400815F08 /* libavdevice.57.10.100.dylib */; };
 		16FA3B7C1FBC40D400815F08 /* libavfilter.6.107.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FA3B741FBC40D400815F08 /* libavfilter.6.107.100.dylib */; };
@@ -74,6 +75,8 @@
 		16E0EBBE1FB8806A0018285F /* SearchTex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SearchTex.h; path = ../src/smaa/SearchTex.h; sourceTree = "<group>"; };
 		16E0EBBF1FB8806A0018285F /* SMAA.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMAA.cpp; path = ../src/smaa/SMAA.cpp; sourceTree = "<group>"; };
 		16E0EBC01FB8806A0018285F /* SMAA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMAA.h; path = ../src/smaa/SMAA.h; sourceTree = "<group>"; };
+		16E7BFB51FD94DAD0027B037 /* FXAA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FXAA.h; path = ../src/fxaa/FXAA.h; sourceTree = "<group>"; };
+		16E7BFB61FD94DAD0027B037 /* FXAA.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FXAA.cpp; path = ../src/fxaa/FXAA.cpp; sourceTree = "<group>"; };
 		16FA3B6D1FBC3F7F00815F08 /* libavcodec.57.107.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libavcodec.57.107.100.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libavcodec.57.107.100.dylib; sourceTree = "<group>"; };
 		16FA3B731FBC40D400815F08 /* libavdevice.57.10.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libavdevice.57.10.100.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libavdevice.57.10.100.dylib; sourceTree = "<group>"; };
 		16FA3B741FBC40D400815F08 /* libavfilter.6.107.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libavfilter.6.107.100.dylib; path = ../../../../../../usr/local/Cellar/ffmpeg/3.4/lib/libavfilter.6.107.100.dylib; sourceTree = "<group>"; };
@@ -138,6 +141,7 @@
 			children = (
 				380EF23AC70E4E3C94EBA7A0 /* PlotSpaceApp.cpp */,
 				16209A711FC8F86800A2C9D1 /* JUtil.cpp */,
+				16E7BFB41FD94D520027B037 /* FXAA */,
 				1639AB831FD53B75003324A2 /* data */,
 				16209A771FCBDD3A00A2C9D1 /* scene */,
 				16209A6B1FC843AF00A2C9D1 /* jpmov */,
@@ -239,6 +243,15 @@
 				16E0EBC01FB8806A0018285F /* SMAA.h */,
 			);
 			name = SMAA;
+			sourceTree = "<group>";
+		};
+		16E7BFB41FD94D520027B037 /* FXAA */ = {
+			isa = PBXGroup;
+			children = (
+				16E7BFB61FD94DAD0027B037 /* FXAA.cpp */,
+				16E7BFB51FD94DAD0027B037 /* FXAA.h */,
+			);
+			name = FXAA;
 			sourceTree = "<group>";
 		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
@@ -373,6 +386,7 @@
 				16209A6D1FC843C600A2C9D1 /* Muxer.cpp in Sources */,
 				16209A7B1FCBDD4500A2C9D1 /* Wavygrass.cpp in Sources */,
 				16209A7A1FCBDD4500A2C9D1 /* Pltspace.cpp in Sources */,
+				16E7BFB71FD94DAD0027B037 /* FXAA.cpp in Sources */,
 				1639AB8A1FD54177003324A2 /* Work2dee.cpp in Sources */,
 				16209A701FC8462100A2C9D1 /* Format.cpp in Sources */,
 				16209A721FC8F86800A2C9D1 /* JUtil.cpp in Sources */,
