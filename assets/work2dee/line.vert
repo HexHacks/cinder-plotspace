@@ -4,10 +4,12 @@ uniform float uTime;
 uniform mat4  ciModelViewProjection;
 
 in vec4 vInstanceEndpoints;
+in vec4 vInstanceData;
 
 in vec4       ciPosition;
 in vec2       ciTexCoord0;
-out vec2      TexCoord0;
+smooth out vec2 TexCoord0;
+flat   out vec4 InstanceData;
 
 
 mat4 getRotation(in vec2 pt0, in vec2 pt1)
@@ -41,5 +43,7 @@ void main( void )
 
     pos = (getRotation(pt0, pt1) * pos) + vec4(pt0, 0., 0.);
     gl_Position = ciModelViewProjection * pos;
+    
     TexCoord0 = ciTexCoord0;
+    InstanceData = vInstanceData;
 }

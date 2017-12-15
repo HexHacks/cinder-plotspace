@@ -91,6 +91,7 @@ class PlotSpaceApp : public App {
     {
         mStartFrame = getElapsedFrames();
         mCtx->t = 0.f;
+        mCtx->dt = 0.f;
         mCtx->frame = 0;
     }
     
@@ -207,7 +208,7 @@ void PlotSpaceApp::update()
     }
     
     mCtx->frame = 0;
-    mCtx->t = getElapsedSeconds();
+    auto prevT = mCtx->t;
     
     if (mCtx->animate)
     {
@@ -218,6 +219,10 @@ void PlotSpaceApp::update()
             mCtx->t = mCtx->frame / float(mMov->getFps());
         }
     }
+    else
+        mCtx->t = getElapsedSeconds();
+    
+    mCtx->dt = mCtx->t - prevT;
     
     mScenes[mActiveScene]->update();
 }

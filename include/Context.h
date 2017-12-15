@@ -28,6 +28,7 @@ namespace jp
         
         bool animate;
         float t;
+        float dt;
         int frame;
         cinder::ivec2 screenSize;
         
