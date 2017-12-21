@@ -39,6 +39,7 @@ namespace  jp
         virtual void deactivate() override;
         virtual void update() override;
         virtual void draw() override;
+        virtual void reset() override;
     };
 }
 

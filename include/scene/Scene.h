@@ -28,6 +28,8 @@ namespace jp
         // Called once at setup
         virtual void setup() = 0;
         
+        virtual void reset() = 0;
+        
         // Called when on scene switch
         virtual void activate() = 0;
         virtual void deactivate() = 0;

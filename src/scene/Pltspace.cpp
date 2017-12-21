@@ -24,9 +24,9 @@ namespace jp
         vec3 mDivs;
         
         void calcSpace();
+    public:
         void resetSpace();
         
-    public:
         PltspaceImpl(ContextRef ctx) : mCtx(ctx) {}
         
         void setup();
@@ -64,6 +64,12 @@ namespace jp
     {
         
     }
+    
+    void Pltspace::reset()
+    {
+        mImpl->resetSpace();
+    }
+    
     void Pltspace::draw()
     {
         mImpl->draw();
@@ -190,9 +196,6 @@ namespace jp
         mDivs = ivec3(20);
         
         mSpace = LineSpace::create(mSize, vec3(mDivs));
-        
-        mCtx->params->addButton("Reset", [this](){ resetSpace(); }, "key=c");
-        
     }
     
     void PltspaceImpl::update()

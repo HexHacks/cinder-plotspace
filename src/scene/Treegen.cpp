@@ -50,3 +50,8 @@ void jp::Treegen::draw()
     gl::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void jp::Treegen::reset()
+{
+    
+}
+

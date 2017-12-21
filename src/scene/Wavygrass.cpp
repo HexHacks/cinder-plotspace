@@ -210,6 +210,11 @@ class WavygrassImpl
         
     }
     
+    void Wavygrass::reset()
+    {
+        
+    }
+    
     void Wavygrass::update()
     {
         mImpl->update();

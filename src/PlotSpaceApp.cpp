@@ -95,6 +95,13 @@ class PlotSpaceApp : public App {
         mCtx->frame = 0;
     }
     
+    void reset()
+    {
+        resetTime();
+        
+        mScenes[mActiveScene]->reset();
+    }
+    
     void startRec()
     {
         resetTime();
@@ -137,9 +144,10 @@ class PlotSpaceApp : public App {
         
         mCtx->params->addParam("Animate", &mCtx->animate).key("a");
         mCtx->params->addParam("SMAA", &mUseSmaa).key("s");
+        mCtx->params->addButton("Reset", [this](){ reset(); }, "key=r");
         mCtx->params->addSeparator();
         mCtx->params->addParam("Rec frames", &mRecFrames).updateFn(timeReset);
-        mCtx->params->addButton("Record", [this](){ startRec(); }, "key=r");
+        mCtx->params->addButton("Record", [this](){ startRec(); }, "key=k");
         mCtx->params->addSeparator();
         mCtx->params->addParam("S/H Debug", &mShowDebug).key("d");
         mCtx->params->addSeparator();

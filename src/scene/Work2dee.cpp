@@ -171,3 +171,8 @@ void jp::Work2dee::draw()
     mBatch->drawInstanced( cNumLines );
 }
 
+void jp::Work2dee::reset()
+{
+    
+}
+
