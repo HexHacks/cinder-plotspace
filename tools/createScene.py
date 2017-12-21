@@ -43,6 +43,7 @@ namespace  jp
         virtual void setup() override;
         virtual void activate() override;
         virtual void deactivate() override;
+        virtual void reset() override;
         virtual void update() override;
         virtual void draw() override;
     }};
@@ -76,6 +77,10 @@ void jp::{0}::activate()
     mCtx->muxFormat.videoOptions["tune"] = "film";
 }}
 void jp::{0}::deactivate()
+{{
+    
+}}
+void jp::{0}::reset()
 {{
     
 }}
